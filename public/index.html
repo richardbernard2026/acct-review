@@ -1,0 +1,1881 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Cash, Receivables &amp; Long-Term Assets</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Sans+3:wght@400;600;700&display=swap">
+<style>
+/* Layout: a fixed 1600x900 stage scaled to the window (presenter), or a single phone column (audience).
+   Look: green-bar ledger paper, ink navy type, one accent per chapter. Dr = teal ink, Cr = red ink.
+   Single committed light look (it is projected), so every color is set explicitly. */
+:root{
+  --paper:#fbfcf8; --band:#edf4ea; --ink:#14202e; --muted:#5b6773; --rule:#cfdacf; --card:#ffffff;
+  --c6:#1b6b4b; --c6s:#dcece2;   /* ch 6 cash: ledger green */
+  --c7:#2c5aa0; --c7s:#dde6f4;   /* ch 7 receivables: statement blue */
+  --c8:#97561a; --c8s:#f3e5d4;   /* ch 8 long-term assets: bronze */
+  --dr:#0d7471; --drs:#d6efed; --cr:#b23a26; --crs:#f7e0da;
+  --good:#1b7a45; --goods:#d7f0df; --badc:#b23a26;
+  --o1:#c2410c; --o2:#1d4ed8; --o3:#a16207; --o4:#15803d;  /* answer tiles */
+  --accent:var(--c6); --accent-s:var(--c6s);
+  --disp:"Archivo","Arial Narrow",system-ui,sans-serif;
+  --sans:"Source Sans 3","Segoe UI",system-ui,-apple-system,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+img{max-width:100%}
+html,body{height:100%}
+body{margin:0;background:#1d2733;color:var(--ink);font:16px/1.5 var(--sans);-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+
+/* ---------- presenter shell ---------- */
+#deck{position:fixed;inset:0;overflow:hidden;background:#1d2733}
+#stage{position:absolute;left:50%;top:50%;width:1600px;height:900px;transform-origin:0 0;background:var(--paper);overflow:hidden;
+  background-image:repeating-linear-gradient(180deg,transparent 0 44px,var(--band) 44px 88px);box-shadow:0 30px 80px rgba(0,0,0,.35)}
+#stage::before{content:"";position:absolute;inset:0 auto 0 0;width:34px;background:
+  radial-gradient(circle at 17px 22px,#1d2733 0 6px,transparent 6.5px) 0 0/34px 44px repeat-y;opacity:.12;pointer-events:none;z-index:3}
+#stage::after{content:"";position:absolute;inset:0 0 0 auto;width:34px;background:
+  radial-gradient(circle at 17px 22px,#1d2733 0 6px,transparent 6.5px) 0 0/34px 44px repeat-y;opacity:.12;pointer-events:none;z-index:3}
+.slide{position:absolute;inset:0;padding:70px 110px 90px;display:flex;flex-direction:column;opacity:0;visibility:hidden;
+  transform:translateX(40px);transition:opacity .45s ease,transform .55s cubic-bezier(.2,.8,.2,1),visibility 0s linear .55s}
+.slide.active{opacity:1;visibility:visible;transform:none;transition:opacity .45s ease,transform .55s cubic-bezier(.2,.8,.2,1),visibility 0s}
+.slide.past{transform:translateX(-40px)}
+.slide[data-ch="6"]{--accent:var(--c6);--accent-s:var(--c6s)}
+.slide[data-ch="7"]{--accent:var(--c7);--accent-s:var(--c7s)}
+.slide[data-ch="8"]{--accent:var(--c8);--accent-s:var(--c8s)}
+
+.eyebrow{display:flex;gap:14px;align-items:center;font:600 17px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:18px}
+.eyebrow .code{background:var(--accent);color:#fff;padding:6px 9px;border-radius:4px;letter-spacing:.04em}
+h1,h2,h3{font-family:var(--disp);margin:0;text-wrap:balance;letter-spacing:-.01em}
+.slide h2{font-size:62px;line-height:1.02;font-weight:800;font-stretch:88%;margin-bottom:26px;max-width:1300px}
+.slide h3{font-size:30px;font-weight:700;font-stretch:92%;margin:0 0 10px}
+.lead{font-size:28px;line-height:1.4;color:var(--muted);max-width:1180px;margin:0 0 22px}
+.slide p{font-size:25px;line-height:1.45;margin:0 0 14px}
+.slide .card{font-size:23px;line-height:1.4}
+.slide li{font-size:25px;line-height:1.4}
+.muted{color:var(--muted)}
+.hl{background:linear-gradient(transparent 58%,var(--accent-s) 58%);padding:0 3px}
+b.ac{color:var(--accent)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:36px;align-items:start}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:26px}
+.grow{flex:1;min-height:0}
+.foot{position:absolute;left:110px;right:110px;bottom:34px;display:flex;justify-content:space-between;font:500 15px var(--mono);color:var(--muted);letter-spacing:.04em}
+
+/* fragments */
+[data-s]{opacity:0;transform:translateY(18px);transition:opacity .45s ease,transform .5s cubic-bezier(.2,.8,.2,1)}
+[data-s].on{opacity:1;transform:none}
+[data-s].fx-left{transform:translateX(-120px)}
+[data-s].fx-right{transform:translateX(120px)}
+[data-s].fx-pop{transform:scale(.8)}
+[data-s].fx-left.on,[data-s].fx-right.on,[data-s].fx-pop.on{transform:none}
+[data-s].fx-fade{transform:none}
+.dim-after.on.dim{opacity:.35}
+
+/* cards & rules */
+.card{background:var(--card);border:2px solid var(--rule);border-radius:14px;padding:24px 28px}
+.card.ac{border-color:var(--accent)}
+.card h3{color:var(--accent)}
+.rule{border:3px solid var(--accent);background:var(--card);border-radius:14px;padding:20px 26px;font-size:28px;line-height:1.35}
+.rule .lab{display:block;font:600 15px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:6px}
+.trap{background:var(--crs);border-left:6px solid var(--cr);border-radius:0 12px 12px 0;padding:16px 22px;font-size:24px}
+.trap b{color:var(--cr)}
+.tip{background:var(--accent-s);border-left:6px solid var(--accent);border-radius:0 12px 12px 0;padding:16px 22px;font-size:24px}
+.formula{font:600 34px var(--mono);color:var(--ink);background:var(--card);border:2px dashed var(--accent);border-radius:12px;padding:18px 24px;display:inline-block}
+.formula small{display:block;font:500 18px var(--sans);color:var(--muted);margin-top:4px}
+
+/* journal entries */
+.je{background:var(--card);border:2px solid var(--rule);border-radius:12px;padding:16px 22px;font:500 22px/1.55 var(--mono);font-variant-numeric:tabular-nums}
+.je .h{font:600 14px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:6px}
+.je .r{display:grid;grid-template-columns:minmax(0,1fr) 104px 104px;gap:8px;align-items:baseline}
+.je .r .a{text-align:right}
+.je .r.d .a.dv{color:var(--dr)} .je .r.c .a.cv{color:var(--cr)}
+.je .r.c span:first-child{padding-left:34px}
+.je .m{font:italic 19px var(--sans);color:var(--muted);margin-top:6px}
+.je .r.plug{background:var(--accent-s);border-radius:6px;margin:0 -8px;padding:0 8px}
+.drcr{font:600 13px var(--mono);padding:2px 6px;border-radius:4px;margin-left:8px;vertical-align:3px}
+.drcr.d{background:var(--drs);color:var(--dr)} .drcr.c{background:var(--crs);color:var(--cr)}
+
+/* tables */
+table.t{border-collapse:collapse;width:100%;font-size:23px}
+table.t th,table.t td{padding:10px 14px;border-bottom:2px solid var(--rule);text-align:left}
+table.t th{font:600 15px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+table.t td.n,table.t th.n{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums}
+table.t tr.tot td{border-top:3px solid var(--ink);font-weight:700}
+
+/* title + chapter dividers */
+.title-slide{justify-content:center}
+.title-slide .kicker{font:600 20px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--c6)}
+.title-slide h1{font-size:120px;line-height:.92;font-weight:900;font-stretch:78%;margin:18px 0 28px;max-width:1150px}
+.title-slide h1 span{display:block}
+.title-slide h1 .s6{color:var(--c6)} .title-slide h1 .s7{color:var(--c7)} .title-slide h1 .s8{color:var(--c8)}
+.joinbox{position:absolute;right:110px;bottom:110px;display:flex;gap:22px;align-items:center;background:var(--card);border:2px solid var(--rule);border-radius:16px;padding:18px 22px}
+.joinbox .qr{width:190px;height:190px}
+.joinbox .qr svg,.qr svg{width:100%;height:100%;display:block}
+.joinbox p{margin:0;font-size:22px;max-width:250px}
+.joinbox b{font-family:var(--disp);font-size:30px;display:block;line-height:1.05;margin-bottom:6px}
+.divider{justify-content:center;background:var(--accent);color:#fff}
+.divider .big{font:900 360px/0.8 var(--disp);font-stretch:70%;position:absolute;right:90px;bottom:40px;opacity:.16}
+.divider .eyebrow{color:#fff;opacity:.85}
+.divider h2{font-size:110px;font-stretch:80%;font-weight:900;color:#fff;max-width:1000px}
+.divider ul{list-style:none;padding:0;margin:10px 0 0;display:flex;flex-wrap:wrap;gap:12px;max-width:1150px}
+.divider li{font:600 20px var(--mono);border:2px solid rgba(255,255,255,.55);border-radius:999px;padding:8px 16px}
+
+/* controls */
+#bar{position:fixed;left:0;right:0;bottom:0;height:6px;background:rgba(255,255,255,.1);z-index:20}
+#bar i{display:block;height:100%;background:#7fd1a8;transition:width .4s}
+#hud{position:fixed;right:max(16px,env(safe-area-inset-right,0px));top:calc(10px + env(safe-area-inset-top,0px));z-index:21;display:flex;gap:8px;align-items:center;opacity:.25;transition:opacity .25s}
+#hud:hover,#hud:focus-within{opacity:1}
+#hud button,#hud span{background:#0f1720;color:#e8eef3;border:1px solid #3a4756;border-radius:8px;padding:8px 12px;font:600 14px var(--mono)}
+#hud span{cursor:default}
+#live{position:fixed;left:max(16px,env(safe-area-inset-left,0px));top:calc(10px + env(safe-area-inset-top,0px));z-index:21;opacity:.55;font:600 13px var(--mono);color:#cfe3d7;background:#0f1720;border:1px solid #3a4756;border-radius:999px;padding:7px 12px;display:flex;gap:8px;align-items:center}
+#live i{width:9px;height:9px;border-radius:50%;background:#7a8590;display:inline-block}
+#live.on i{background:#4ade80;box-shadow:0 0 0 4px rgba(74,222,128,.2)}
+
+/* ---------- poll slides ---------- */
+.poll{display:grid;grid-template-columns:1fr 330px;gap:46px;flex:1;min-height:0}
+.poll .qtext{font:700 44px/1.15 var(--disp);font-stretch:92%;margin:0 0 28px;max-width:1000px}
+.opts{display:grid;gap:14px}
+.opt{position:relative;display:grid;grid-template-columns:62px 1fr 110px;align-items:center;gap:18px;background:var(--card);border:2px solid var(--rule);border-radius:12px;padding:12px 18px;min-height:76px;overflow:hidden}
+.opt .fill{position:absolute;inset:0 auto 0 0;width:0;background:var(--accent-s);transition:width 1.1s cubic-bezier(.2,.8,.2,1);z-index:0}
+.opt > *:not(.fill){position:relative;z-index:1}
+.opt .let{font:800 30px var(--disp);width:50px;height:50px;border-radius:10px;display:grid;place-items:center;color:#fff}
+.opt:nth-child(1) .let{background:var(--o1)} .opt:nth-child(2) .let{background:var(--o2)} .opt:nth-child(3) .let{background:var(--o3)} .opt:nth-child(4) .let{background:var(--o4)}
+.opt .tx{font-size:29px;font-weight:600}
+.opt .pct{font:600 30px var(--mono);text-align:right;opacity:0;transition:opacity .4s .6s}
+.revealed .opt .pct{opacity:1}
+.revealed .opt.correct{border-color:var(--good);box-shadow:0 0 0 4px var(--goods)}
+.revealed .opt.correct .fill{background:#bfe6cc}
+.revealed .opt:not(.correct){opacity:.62}
+.revealed .opt.correct::after{content:"✓";position:absolute;right:130px;top:50%;transform:translateY(-50%);font:800 40px var(--disp);color:var(--good);z-index:2}
+.why{margin-top:18px;font-size:24px;opacity:0;transform:translateY(10px);transition:all .5s .9s}
+.revealed .why{opacity:1;transform:none}
+.side{display:flex;flex-direction:column;gap:16px}
+.side .qrcard{background:var(--card);border:2px solid var(--rule);border-radius:16px;padding:16px;text-align:center}
+.side .qrcard .qr{width:100%;aspect-ratio:1}
+.side .qrcard p{margin:8px 0 0;font:600 17px var(--mono);color:var(--muted)}
+.counter{background:var(--ink);color:#fff;border-radius:16px;padding:18px 20px;text-align:center}
+.counter b{display:block;font:800 76px/1 var(--disp);font-variant-numeric:tabular-nums}
+.counter span{font:600 16px var(--mono);letter-spacing:.08em;text-transform:uppercase;opacity:.75}
+.revealbtn{background:var(--accent);color:#fff;border:0;border-radius:14px;padding:18px;font:800 26px var(--disp);letter-spacing:.02em}
+.revealbtn:hover{filter:brightness(1.08)}
+.revealed .revealbtn{background:var(--muted)}
+.pollnote{font:500 15px var(--mono);color:var(--muted);text-align:center}
+
+/* ---------- game (presenter) ---------- */
+.game{position:absolute;inset:0;background:#13202e;color:#f3f6f9;display:flex;flex-direction:column;padding:56px 96px 70px;
+  background-image:radial-gradient(circle at 15% 20%,rgba(127,209,168,.10),transparent 40%),radial-gradient(circle at 85% 80%,rgba(120,160,230,.12),transparent 45%)}
+.game h2{color:#fff}
+.g-top{display:flex;justify-content:space-between;align-items:center;font:600 18px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:#9fb3c4}
+.g-lobby{display:grid;grid-template-columns:420px 1fr;gap:56px;flex:1;align-items:center}
+.g-lobby .qrcard{background:#fff;border-radius:20px;padding:20px}
+.g-lobby .qr{width:100%;aspect-ratio:1}
+.g-lobby h2{font:900 96px/.95 var(--disp);font-stretch:78%;margin-bottom:20px}
+.names{display:flex;flex-wrap:wrap;gap:12px;margin-top:24px;max-height:330px;overflow:hidden}
+.names span{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:8px 16px;font:600 22px var(--sans);animation:popin .4s cubic-bezier(.2,1.4,.4,1)}
+@keyframes popin{from{transform:scale(.4);opacity:0}to{transform:none;opacity:1}}
+.g-q{flex:1;display:flex;flex-direction:column;gap:26px;min-height:0}
+.g-q .qt{font:800 52px/1.12 var(--disp);font-stretch:90%;text-align:center;max-width:1250px;margin:6px auto 0;text-wrap:balance}
+.g-mid{display:flex;align-items:center;justify-content:space-between;gap:24px}
+.timer{width:150px;height:150px;position:relative}
+.timer svg{width:100%;height:100%;transform:rotate(-90deg)}
+.timer b{position:absolute;inset:0;display:grid;place-items:center;font:800 58px var(--disp);font-variant-numeric:tabular-nums}
+.ansct{text-align:center;font:600 18px var(--mono);color:#9fb3c4;letter-spacing:.06em;text-transform:uppercase}
+.ansct b{display:block;font:800 64px/1 var(--disp);color:#fff;letter-spacing:0}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:auto}
+.tile{display:flex;align-items:center;gap:22px;border-radius:14px;padding:22px 26px;font:700 34px var(--sans);color:#fff;min-height:110px;position:relative;transition:opacity .4s,transform .4s}
+.tile .sh{width:48px;height:48px;flex:0 0 auto}
+.tile .ct{margin-left:auto;font:700 34px var(--mono);opacity:0}
+.t1{background:var(--o1)} .t2{background:var(--o2)} .t3{background:var(--o3)} .t4{background:var(--o4)}
+.g-reveal .tile:not(.correct){opacity:.28;transform:scale(.97)}
+.g-reveal .tile .ct{opacity:1}
+.g-reveal .tile.correct{box-shadow:0 0 0 6px #fff}
+.g-why{text-align:center;font-size:26px;color:#d5e0ea;max-width:1200px;margin:0 auto;min-height:40px}
+.board{flex:1;display:flex;flex-direction:column;gap:12px;max-width:1000px;width:100%;margin:20px auto 0}
+.brow{display:grid;grid-template-columns:70px 1fr 160px;align-items:center;background:rgba(255,255,255,.08);border-radius:12px;padding:14px 22px;font:700 32px var(--sans);
+  animation:slidein .5s cubic-bezier(.2,.8,.2,1) both}
+.brow .rk{font:800 34px var(--disp);color:#7fd1a8}
+.brow .sc{text-align:right;font:600 32px var(--mono)}
+@keyframes slidein{from{transform:translateX(-60px);opacity:0}to{transform:none;opacity:1}}
+.podium{flex:1;display:flex;justify-content:center;align-items:flex-end;gap:26px;padding-bottom:10px}
+.pod{width:300px;text-align:center}
+.pod .nm{font:800 36px var(--disp);margin-bottom:6px;word-break:break-word}
+.pod .ps{font:600 24px var(--mono);color:#cfe3d7;margin-bottom:12px}
+.pod .blk{border-radius:14px 14px 0 0;display:grid;place-items:center;font:900 90px var(--disp);color:#13202e;animation:rise 1s cubic-bezier(.2,.8,.2,1) both}
+.pod.p1 .blk{height:330px;background:#f5c84c;animation-delay:.9s} .pod.p2 .blk{height:240px;background:#d4dbe2;animation-delay:.45s} .pod.p3 .blk{height:180px;background:#d99a5b}
+@keyframes rise{from{transform:scaleY(0);transform-origin:bottom}to{transform:scaleY(1);transform-origin:bottom}}
+.gbtn{background:#7fd1a8;color:#0d1a14;border:0;border-radius:12px;padding:14px 22px;font:800 22px var(--disp)}
+.gbtn.ghost{background:transparent;color:#cfe3d7;border:2px solid #3e5266}
+
+/* ---------- interactive bits ---------- */
+.seg{display:inline-flex;border:2px solid var(--accent);border-radius:10px;overflow:hidden}
+.seg button{background:var(--card);border:0;padding:10px 18px;font:600 20px var(--sans);color:var(--accent)}
+.seg button+button{border-left:2px solid var(--accent)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:#fff}
+input[type=range]{width:100%;accent-color:var(--accent);height:30px}
+.pill{display:inline-block;font:600 16px var(--mono);padding:5px 10px;border-radius:999px;background:var(--accent-s);color:var(--accent)}
+
+/* ---------- audience (phone) ---------- */
+#aud{min-height:100%;background:var(--paper);background-image:repeating-linear-gradient(180deg,transparent 0 28px,var(--band) 28px 56px)}
+#aud .wrap{max-width:560px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 40px;display:flex;flex-direction:column;gap:16px;min-height:100%}
+.a-top{display:flex;justify-content:space-between;align-items:center;font:600 13px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.a-top .me{background:var(--ink);color:#fff;border-radius:999px;padding:5px 11px;text-transform:none;letter-spacing:0;font-family:var(--sans);font-size:14px}
+.a-card{background:var(--card);border:2px solid var(--rule);border-radius:16px;padding:20px}
+.a-card h1{font:800 32px/1.05 var(--disp);font-stretch:85%;margin:0 0 8px}
+.a-card p{margin:0 0 10px;font-size:17px}
+.a-q{font:700 23px/1.25 var(--disp);font-stretch:94%;margin:0}
+.a-opts{display:grid;gap:10px}
+.a-opt{display:grid;grid-template-columns:40px 1fr auto;gap:12px;align-items:center;text-align:left;background:var(--card);border:2px solid var(--rule);border-radius:12px;padding:12px 14px;font-size:18px;min-height:60px;position:relative;overflow:hidden}
+.a-opt .let{width:36px;height:36px;border-radius:8px;display:grid;place-items:center;color:#fff;font:800 19px var(--disp)}
+.a-opt:nth-child(1) .let{background:var(--o1)} .a-opt:nth-child(2) .let{background:var(--o2)} .a-opt:nth-child(3) .let{background:var(--o3)} .a-opt:nth-child(4) .let{background:var(--o4)}
+.a-opt[aria-pressed="true"]{border-color:var(--ink);box-shadow:0 0 0 3px var(--ink) inset}
+.a-opt .fill{position:absolute;inset:0 auto 0 0;background:var(--c6s);width:0;transition:width .9s}
+.a-opt > *:not(.fill){position:relative}
+.a-opt .pc{font:600 16px var(--mono)}
+.a-opt.correct{border-color:var(--good)}
+.a-opt.correct .fill{background:#bfe6cc}
+.a-input{width:100%;font:600 22px var(--sans);padding:14px 16px;border:2px solid var(--rule);border-radius:12px;background:#fff;color:var(--ink)}
+.a-btn{width:100%;background:var(--ink);color:#fff;border:0;border-radius:12px;padding:16px;font:800 22px var(--disp)}
+.a-btn:disabled{opacity:.4}
+.a-status{font:600 15px var(--mono);color:var(--muted);text-align:center}
+.a-big{font:900 54px/1 var(--disp);font-stretch:80%;margin:4px 0}
+.verdict-ok{color:var(--good)} .verdict-no{color:var(--cr)}
+.a-tiles{display:grid;grid-template-columns:1fr 1fr;gap:12px;flex:1;min-height:340px}
+.a-tile{border:0;border-radius:16px;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:14px;font:700 17px/1.2 var(--sans);text-align:center}
+.a-tile .sh{width:44px;height:44px}
+.a-tile:active{transform:scale(.97)}
+.a-tile[disabled]{opacity:.35}
+.a-tile.mine{opacity:1;box-shadow:0 0 0 4px var(--ink)}
+.a-timer{height:10px;background:var(--rule);border-radius:999px;overflow:hidden}
+.a-timer i{display:block;height:100%;background:var(--ink);width:100%}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{transition-duration:.01ms!important;animation-duration:.01ms!important}}
+</style>
+<style>
+.recitem{display:flex;gap:14px;align-items:center;background:var(--card);border:2px solid var(--rule);border-radius:10px;padding:12px 16px;font-size:24px}
+.recitem b{font:800 30px var(--mono);width:38px;text-align:center}
+.recitem .plus{color:var(--good)} .recitem .minus{color:var(--cr)} .recitem .pm{color:var(--muted)}
+.mbar{height:14px;background:var(--rule);border-radius:999px;overflow:hidden;margin-top:14px}
+.mbar i{display:block;height:100%;width:0;background:var(--accent);transition:width 1s cubic-bezier(.2,.8,.2,1) .2s}
+.on > .mbar i,.on .mbar i{width:var(--w)}
+.arrowcell{display:grid;place-items:center;font:800 44px var(--disp);color:var(--accent)}
+.citem{display:flex;justify-content:space-between;gap:12px;align-items:center;background:var(--accent-s);border-radius:8px;padding:9px 14px;font-size:22px}
+.citem.bad{background:var(--crs)}
+.lsrow{display:grid;grid-template-columns:200px 1fr;align-items:center;gap:20px;margin-top:14px}
+.lslab{font:600 18px var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.lsbar{display:flex;height:64px;border-radius:10px;overflow:hidden;border:3px solid var(--ink);font:600 19px var(--mono)}
+.lsbar div{display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.15;color:#fff;transform-origin:left;transition:transform .8s cubic-bezier(.2,.8,.2,1)}
+.lsbar div small{font-size:14px;opacity:.85}
+[data-s]:not(.on) .lsbar div{transform:scaleX(0)}
+.stepc{display:grid;grid-template-columns:44px 1fr;gap:14px;align-items:start;background:var(--card);border:2px solid var(--rule);border-radius:10px;padding:12px 16px;font-size:21px;line-height:1.35}
+.stepc > b{width:40px;height:40px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font:800 22px var(--disp)}
+.gauge{position:relative;height:64px;border-radius:10px;background:linear-gradient(90deg,var(--crs) 0 50%,var(--goods) 50% 100%);border:3px solid var(--ink)}
+.gauge .gz{position:absolute;left:50%;top:-8px;bottom:-8px;width:3px;background:var(--ink)}
+.gauge .gm{position:absolute;top:8px;bottom:8px;border-radius:6px;transition:all .25s}
+.gauge .g0{position:absolute;left:50%;transform:translateX(-50%);bottom:-30px;font:600 15px var(--mono);color:var(--muted);white-space:nowrap}
+.qseg{display:grid;place-items:center;transform-origin:left;transition:transform .9s cubic-bezier(.2,.8,.2,1)}
+.qseg:not(.on){transform:scaleX(0)!important;opacity:1}
+.traplist{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:1fr 1fr;gap:14px 36px}
+.traplist li{display:grid;grid-template-columns:40px 1fr;gap:14px;align-items:center;background:var(--card);border:2px solid var(--rule);border-radius:10px;padding:12px 16px;font-size:23px}
+.traplist li span{flex:0 0 auto;width:40px;height:40px;border-radius:8px;display:grid;place-items:center;color:#fff;font:800 22px var(--disp)}
+.traplist .c6{background:var(--c6)} .traplist .c7{background:var(--c7)} .traplist .c8{background:var(--c8)}
+.flip{position:relative;height:170px;perspective:900px;border:0;background:none;padding:0;text-align:left}
+.flip .fi{position:absolute;inset:0;transition:transform .6s cubic-bezier(.2,.8,.2,1);transform-style:preserve-3d}
+.flip[aria-pressed="true"] .fi{transform:rotateY(180deg)}
+.flip .fa,.flip .fb{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:12px;padding:18px 20px;display:flex;flex-direction:column;justify-content:center;gap:6px}
+.flip .fa{background:var(--card);border:2px solid var(--rule);font-size:23px;font-weight:600}
+.flip .fa small{font:500 14px var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.flip .fb{transform:rotateY(180deg);color:#fff;font-size:19px}
+.flip .fb b{font:800 30px var(--disp)}
+.flip .fb.exp{background:var(--cr)} .flip .fb.cap{background:var(--accent)}
+.depchart{position:relative;display:flex;align-items:flex-end;gap:16px;height:330px;margin-top:16px;border-bottom:3px solid var(--ink);padding:0 6px}
+.depchart .col{flex:1;display:flex;flex-direction:column;justify-content:flex-end;height:100%;position:relative}
+.depchart .col .ad{background:#e2c39c;transition:height .7s cubic-bezier(.2,.8,.2,1);border-radius:6px 6px 0 0}
+.depchart .col .bv{background:var(--accent);transition:height .7s cubic-bezier(.2,.8,.2,1)}
+.depchart .col .lb{position:absolute;left:0;right:0;text-align:center;font:600 17px var(--mono);transition:bottom .7s cubic-bezier(.2,.8,.2,1)}
+.depchart .sal{position:absolute;left:0;right:0;border-top:3px dashed var(--cr);pointer-events:none}
+.depx{display:flex;gap:16px;padding:6px 6px 0;font:600 16px var(--mono);color:var(--muted)}
+.depx span{flex:1;text-align:center}
+.dlegend{display:flex;gap:18px;font:600 15px var(--mono);color:var(--muted);margin-top:8px}
+.dlegend i{display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:-2px;margin-right:6px}
+.splash{position:fixed;inset:0;display:grid;place-items:center;background:var(--paper);font:600 16px var(--mono);color:var(--muted)}
+.tdot{aspect-ratio:1;border-radius:50%;border:4px solid var(--accent);display:grid;place-items:center;font:700 24px var(--mono);color:var(--accent);transition:background .35s var(--d),color .35s var(--d)}
+.on .tdot,.on.tdot{background:var(--accent);color:#fff}
+.tri-cards .card{padding:14px 22px}.tri-cards h3{font-size:26px;margin-bottom:4px}.tri-cards p{font-size:22px}.tri-cards .tip{font-size:21px;padding:12px 18px}
+#keyBox[hidden]{display:none}
+#keyBox{position:fixed;inset:0;z-index:40;background:rgba(15,23,32,.72);display:grid;place-items:center;padding:16px}
+.keycard{background:var(--paper);border-radius:16px;padding:28px;width:min(440px,100%);display:grid;gap:10px;box-shadow:0 30px 80px rgba(0,0,0,.4)}
+.keycard h2{font:800 34px var(--disp);font-stretch:85%;margin:0}
+.keycard p{margin:0;color:var(--muted)}
+.keycard label{font:600 13px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.keycard input{font:600 20px var(--mono);padding:12px 14px;border:2px solid var(--rule);border-radius:10px;background:#fff;color:var(--ink)}
+.keyrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
+.kgo{background:var(--c6);color:#fff;border:0;border-radius:10px;padding:12px 16px;font:700 17px var(--sans)}
+.kskip{background:none;border:2px solid var(--rule);border-radius:10px;padding:12px 16px;font:600 16px var(--sans)}
+body.idle,body.idle *{cursor:none!important}
+body.idle #hud,body.idle #live{opacity:0}
+</style>
+</head><body>
+<div id="deck" hidden>
+<div id="stage">
+
+<!-- ============ OPENING ============ -->
+<section class="slide title-slide" data-ch="6" data-id="title" data-title="Welcome">
+  <div class="kicker">ACCT 2301 · Wild, Financial Accounting · Review session</div>
+  <h1><span class="s6">Cash.</span><span class="s7">Receivables.</span><span class="s8">Long-term assets.</span></h1>
+  <p class="lead" style="max-width:780px">Chapters 6, 7 and 8: the ideas, the entries, the math, and the traps the exam will set. Every number in here works without a calculator.</p>
+  <p class="muted" style="font-size:22px;margin:0">Presented by Richard Bernard</p>
+  <div class="joinbox"><div class="qr" data-qr></div><div><b>Grab your phone</b><p>Scan to join, or go to <b data-joinhost style="font-size:20px;display:inline;font-family:var(--mono)"></b></p></div></div>
+</section>
+
+<section class="slide" data-ch="6" data-id="agenda" data-title="How this hour works">
+  <div class="eyebrow">The plan</div>
+  <h2>How this hour works</h2>
+  <div class="grid3" style="margin-top:6px">
+    <div class="card" data-s="1" style="border-top:8px solid var(--c6)"><div class="pill" style="background:var(--c6s);color:var(--c6)">Chapter 6</div><h3 style="color:var(--c6);margin-top:12px">Cash, fraud &amp; internal control</h3><p class="muted" style="font-size:22px">Controls, cash over and short, petty cash, bank reconciliations, days' sales uncollected.</p></div>
+    <div class="card" data-s="2" style="border-top:8px solid var(--c7)"><div class="pill" style="background:var(--c7s);color:var(--c7)">Chapter 7</div><h3 style="color:var(--c7);margin-top:12px">Receivables</h3><p class="muted" style="font-size:22px">Card sales, bad debts both ways, estimating the allowance, notes and interest.</p></div>
+    <div class="card" data-s="3" style="border-top:8px solid var(--c8)"><div class="pill" style="background:var(--c8s);color:var(--c8)">Chapter 8</div><h3 style="color:var(--c8);margin-top:12px">Long-term assets</h3><p class="muted" style="font-size:22px">Cost, three depreciation methods, disposals, depletion, intangibles.</p></div>
+  </div>
+  <div class="grid2" style="margin-top:28px">
+    <div class="tip" data-s="4"><b>Live checks.</b> After each big idea a question pops up on your phone. Answer, then we reveal how the room did.</div>
+    <div class="tip" data-s="5" style="border-color:var(--ink);background:#e7ebef"><b>The final game.</b> Timed questions from all three chapters. Faster correct answers score more.</div>
+  </div>
+</section>
+
+<!-- ============ CHAPTER 6 ============ -->
+<section class="slide divider" data-ch="6" data-id="d6" data-title="Chapter 6">
+  <div class="big">06</div>
+  <div class="eyebrow">Chapter 6</div>
+  <h2>Cash, Fraud &amp; Internal Control</h2>
+  <ul><li>C1 Internal control</li><li>C2 Cash &amp; equivalents</li><li>P1 Receipts &amp; payments</li><li>P2 Petty cash</li><li>P3 Bank reconciliation</li><li>P4 Voucher system</li><li>A1 Days' sales uncollected</li></ul>
+</section>
+
+<section class="slide" data-ch="6" data-id="triangle" data-title="The fraud triangle">
+  <div class="eyebrow"><span class="code">C1</span> Why controls exist</div>
+  <h2>Fraud needs three things. Controls take one away.</h2>
+  <div class="grid2" style="grid-template-columns:560px 1fr;gap:56px;align-items:start">
+    <svg viewBox="0 0 600 560" style="width:560px;height:523px" aria-label="Fraud triangle">
+      <polygon id="triPoly" points="300,70 540,470 60,470" fill="none" stroke="#14202e" stroke-width="5" stroke-linejoin="round" stroke-dasharray="1500" stroke-dashoffset="1500" style="transition:stroke-dashoffset 1.4s ease"/>
+      <g data-s="1" class="fx-pop"><circle cx="60" cy="470" r="34" fill="#1b6b4b"/><text x="60" y="481" text-anchor="middle" fill="#fff" font-family="Archivo,Arial,sans-serif" font-weight="800" font-size="30">1</text><text x="20" y="545" text-anchor="start" fill="#1b6b4b" font-family="Archivo,Arial,sans-serif" font-weight="800" font-size="30">OPPORTUNITY</text></g>
+      <g data-s="2" class="fx-pop"><circle cx="300" cy="70" r="34" fill="#14202e"/><text x="300" y="81" text-anchor="middle" fill="#fff" font-family="Archivo,Arial,sans-serif" font-weight="800" font-size="30">2</text><text x="350" y="40" text-anchor="start" fill="#14202e" font-family="Archivo,Arial,sans-serif" font-weight="800" font-size="30">PRESSURE</text></g>
+      <g data-s="3" class="fx-pop"><circle cx="540" cy="470" r="34" fill="#14202e"/><text x="540" y="481" text-anchor="middle" fill="#fff" font-family="Archivo,Arial,sans-serif" font-weight="800" font-size="30">3</text><text x="590" y="545" text-anchor="end" fill="#14202e" font-family="Archivo,Arial,sans-serif" font-weight="800" font-size="30">RATIONALIZATION</text></g>
+      <g data-s="4" class="fx-fade"><text x="300" y="340" text-anchor="middle" fill="#b23a26" font-family="IBM Plex Mono,monospace" font-weight="600" font-size="22">remove any side</text><text x="300" y="370" text-anchor="middle" fill="#b23a26" font-family="IBM Plex Mono,monospace" font-weight="600" font-size="22">and it collapses</text></g>
+    </svg>
+    <div style="display:grid;gap:12px" class="tri-cards">
+      <div class="card ac" data-s="1"><h3>Opportunity</h3><p style="margin:0">A way to take something and hide it. <b>Weak controls create this.</b></p></div>
+      <div class="card" data-s="2"><h3 style="color:var(--ink)">Pressure</h3><p style="margin:0">Debt, a quota, a habit, an expectation to hit.</p></div>
+      <div class="card" data-s="3"><h3 style="color:var(--ink)">Rationalization</h3><p style="margin:0">"I'll pay it back." "They underpay me anyway."</p></div>
+      <div class="tip" data-s="4">A company can't control pressure or excuses. It <b>can</b> control opportunity. That is the job of internal control. SOX makes public companies document and test theirs.</div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-ch="6" data-id="principles" data-title="Seven principles of internal control">
+  <div class="eyebrow"><span class="code">C1</span> Principles of internal control</div>
+  <h2>Seven principles, each with a real-world tell</h2>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px">
+    <div class="card" data-s="1"><div class="pill">1</div><h3 style="font-size:25px;margin-top:10px">Establish responsibilities</h3><p class="muted" style="font-size:20px;margin:0">One cashier per drawer, so a shortage has a name.</p></div>
+    <div class="card" data-s="2"><div class="pill">2</div><h3 style="font-size:25px;margin-top:10px">Maintain adequate records</h3><p class="muted" style="font-size:20px;margin:0">Prenumbered checks and invoices. A missing number gets noticed.</p></div>
+    <div class="card" data-s="3"><div class="pill">3</div><h3 style="font-size:25px;margin-top:10px">Insure assets, bond key employees</h3><p class="muted" style="font-size:20px;margin:0">Bonding is insurance against theft by the people handling cash.</p></div>
+    <div class="card ac" data-s="4"><div class="pill">4</div><h3 style="font-size:25px;margin-top:10px">Separate recordkeeping from custody</h3><p class="muted" style="font-size:20px;margin:0">Whoever holds the cash never records it.</p></div>
+    <div class="card ac" data-s="5"><div class="pill">5</div><h3 style="font-size:25px;margin-top:10px">Divide related transactions</h3><p class="muted" style="font-size:20px;margin:0">Ordering, receiving and paying are three different people.</p></div>
+    <div class="card" data-s="6"><div class="pill">6</div><h3 style="font-size:25px;margin-top:10px">Apply technological controls</h3><p class="muted" style="font-size:20px;margin:0">Registers, scanners, passwords, time clocks.</p></div>
+    <div class="card" data-s="7"><div class="pill">7</div><h3 style="font-size:25px;margin-top:10px">Regular, independent reviews</h3><p class="muted" style="font-size:20px;margin:0">Audits by someone outside the process.</p></div>
+    <div class="trap" data-s="8" style="font-size:20px;align-self:stretch"><b>Limits:</b> human error, collusion (two people working together beat separation of duties), and cost versus benefit.</div>
+  </div>
+</section>
+
+<section class="slide" data-ch="6" data-id="cash" data-title="What counts as cash">
+  <div class="eyebrow"><span class="code">C2</span> <span class="code">P1</span> Cash and its controls</div>
+  <h2>What counts as cash, and three rules for guarding it</h2>
+  <div class="grid2" style="gap:44px">
+    <div style="display:grid;gap:18px">
+      <div class="card" data-s="1"><h3>Cash</h3><p style="margin:0">Currency, coins, checking and savings balances, and checks or money orders you've received.</p></div>
+      <div class="card" data-s="2"><h3>Cash equivalents</h3><p style="margin:0">Short-term, highly liquid investments with an original maturity of <b class="ac">3 months or less</b>: T-bills, money market funds.</p></div>
+      <div class="trap" data-s="3"><b>Trap:</b> a 6-month CD bought today is <b>not</b> a cash equivalent. Count the maturity from the day you bought it.</div>
+    </div>
+    <div style="display:grid;gap:18px">
+      <div class="card ac" data-s="4" style="display:grid;grid-template-columns:56px 1fr;gap:14px;align-items:start"><span class="pill" style="font-size:22px;text-align:center">1</span><p style="margin:0"><b>Separate handling cash from recording it.</b></p></div>
+      <div class="card ac" data-s="5" style="display:grid;grid-template-columns:56px 1fr;gap:14px;align-items:start"><span class="pill" style="font-size:22px;text-align:center">2</span><p style="margin:0"><b>Deposit all receipts promptly</b>, usually every day.</p></div>
+      <div class="card ac" data-s="6" style="display:grid;grid-template-columns:56px 1fr;gap:14px;align-items:start"><span class="pill" style="font-size:22px;text-align:center">3</span><p style="margin:0"><b>Pay by check or EFT</b>. The only exception is small petty cash purchases.</p></div>
+      <p class="muted" data-s="6" style="font-size:21px">Liquidity is how fast an asset turns into cash. Cash is the most liquid asset, which is exactly why it gets stolen.</p>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-ch="6" data-id="overshort" data-title="Cash Over and Short">
+  <div class="eyebrow"><span class="code">P1</span> Cash Over and Short</div>
+  <h2>When the drawer doesn't match the tape</h2>
+  <div class="grid2" style="grid-template-columns:520px 1fr;gap:50px">
+    <div style="display:grid;gap:16px">
+      <div class="card"><div class="muted num" style="font-size:18px">REGISTER TAPE</div><div class="num" style="font-size:54px;font-weight:600">$2,340</div><div class="muted num" style="font-size:18px;margin-top:10px">CASH COUNTED IN DRAWER</div><div class="num" style="font-size:54px;font-weight:600">$2,331</div></div>
+      <div class="rule" data-s="5"><span class="lab">The rule</span><b>Short</b> = money lost = <b style="color:var(--dr)">debit</b> (acts like an expense)<br><b>Over</b> = money gained = <b style="color:var(--cr)">credit</b> (acts like revenue)</div>
+    </div>
+    <div style="display:grid;gap:16px;align-content:start">
+      <div class="je">
+        <div class="h">Record the day's sales</div>
+        <div class="r d" data-s="1"><span>Cash <span class="drcr d">what you counted</span></span><span class="a dv">2,331</span><span></span></div>
+        <div class="r d plug" data-s="3"><span>Cash Over and Short <span class="drcr d">the plug</span></span><span class="a dv">9</span><span></span></div>
+        <div class="r c" data-s="2"><span>Sales <span class="drcr c">what the tape says</span></span><span></span><span class="a cv">2,340</span></div>
+      </div>
+      <div class="tip" data-s="3">Debits 2,331, credits 2,340. The entry is 9 short on the debit side, so the plug goes there.</div>
+      <div class="trap" data-s="4"><b>Why people flip it:</b> "short" sounds like cash went down, and cash going down is a credit. But Cash Over and Short isn't cash. It's an income statement account, like a loss.</div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-ch="6" data-poll="p1" data-title="Live check: register"></section>
+
+<section class="slide" data-ch="6" data-id="voucher" data-title="The voucher system">
+  <div class="eyebrow"><span class="code">P4</span> Voucher system</div>
+  <h2>Six documents stand between an order and a check</h2>
+  <div class="vflow" style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px 36px;position:relative">
+    <div class="card" data-s="1"><div class="pill">1 · Department</div><h3 style="margin-top:10px">Purchase requisition</h3><p class="muted" style="font-size:21px;margin:0">A department asks purchasing to buy something.</p></div>
+    <div class="card ac" data-s="2"><div class="pill">2 · Purchasing</div><h3 style="margin-top:10px">Purchase order</h3><p style="font-size:21px;margin:0">Sent to the vendor. Copies go to accounting, the department, and <b class="hl">receiving, with the quantities left off</b>.</p></div>
+    <div class="card" data-s="3"><div class="pill">3 · Vendor</div><h3 style="margin-top:10px">Invoice</h3><p class="muted" style="font-size:21px;margin:0">The vendor's bill for what it shipped.</p></div>
+    <div class="card" data-s="4"><div class="pill">4 · Receiving</div><h3 style="margin-top:10px">Receiving report</h3><p class="muted" style="font-size:21px;margin:0">Receiving's own count of what arrived. No quantities to copy, so they have to count.</p></div>
+    <div class="card" data-s="5"><div class="pill">5 · Accounting</div><h3 style="margin-top:10px">Invoice approval</h3><p class="muted" style="font-size:21px;margin:0">Checklist: requested? ordered? received? Price, math, terms right?</p></div>
+    <div class="card ac" data-s="6"><div class="pill">6 · Accounting</div><h3 style="margin-top:10px">Voucher</h3><p style="font-size:21px;margin:0">The finished file. It authorizes recording the liability and paying it.</p></div>
+  </div>
+  <div class="tip" data-s="7" style="margin-top:18px;font-size:22px">Why so many steps? Ordering, receiving and paying are split (principle 5), so nobody can buy something for themselves and approve the payment too.</div>
+</section>
+
+<section class="slide" data-ch="6" data-id="petty" data-title="Petty cash">
+  <div class="eyebrow"><span class="code">P2</span> Petty cash</div>
+  <h2>Petty cash: the check always equals fund minus cash</h2>
+  <div class="grid2" style="grid-template-columns:600px 1fr;gap:50px">
+    <div style="display:grid;gap:14px">
+      <div class="je" data-s="1"><div class="h">1 · Set up a $200 fund</div>
+        <div class="r d"><span>Petty Cash</span><span class="a dv">200</span><span></span></div>
+        <div class="r c"><span>Cash</span><span></span><span class="a cv">200</span></div></div>
+      <div class="je" data-s="2"><div class="h">2 · Reimburse it (see the box)</div>
+        <div id="pcJE"></div>
+        <div class="m">Expenses get debited. The Petty Cash account itself is not touched.</div></div>
+      <div class="tip" data-s="3" style="font-size:21px"><b>Petty Cash is only debited or credited</b> when the fund's size changes, like raising it from $200 to $300.</div>
+    </div>
+    <div data-s="2" style="display:grid;gap:16px;align-content:start">
+      <div class="card">
+        <div class="muted num" style="font-size:17px;margin-bottom:8px">THE BOX · FUND $200 · RECEIPTS $162</div>
+        <div id="pcBar" style="display:flex;height:64px;border:3px solid var(--ink);border-radius:10px;overflow:hidden;font:600 18px var(--mono)"></div>
+        <div id="pcLeg" class="num" style="display:flex;justify-content:space-between;font-size:17px;color:var(--muted);margin-top:8px"></div>
+        <div style="margin-top:16px" class="seg" id="pcSeg" role="group" aria-label="Count in the box">
+          <button type="button" data-v="38" aria-pressed="true">Box has $38</button><button type="button" data-v="35" aria-pressed="false">Box has $35</button><button type="button" data-v="43" aria-pressed="false">Box has $43</button>
+        </div>
+      </div>
+      <div class="rule" id="pcRule"></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-ch="6" data-poll="p2" data-title="Live check: petty cash"></section>
+
+<section class="slide" data-ch="6" data-id="recsides" data-title="Bank reconciliation: which side">
+  <div class="eyebrow"><span class="code">P3</span> Bank reconciliation</div>
+  <h2>Ask one question: who hasn't recorded it yet?</h2>
+  <div class="grid2" style="gap:40px;flex:1">
+    <div class="card" style="border-color:var(--ink);border-width:3px">
+      <h3 style="color:var(--ink)">The bank doesn't know yet → <span class="hl">bank side</span></h3>
+      <p class="muted" style="font-size:20px">Entries needed: <b style="color:var(--ink)">never</b>. Your books are already right.</p>
+      <div style="display:grid;gap:10px;margin-top:8px">
+        <div class="recitem fx-right" data-s="1"><b class="plus">+</b> Deposits in transit</div>
+        <div class="recitem fx-right" data-s="2"><b class="minus">−</b> Outstanding checks</div>
+        <div class="recitem fx-right" data-s="5"><b class="pm">±</b> Bank errors</div>
+      </div>
+    </div>
+    <div class="card ac" style="border-width:3px">
+      <h3>Your books don't know yet → <span class="hl">book side</span></h3>
+      <p class="muted" style="font-size:20px">Entries needed: <b style="color:var(--ink)">every single one</b>.</p>
+      <div style="display:grid;gap:10px;margin-top:8px">
+        <div class="recitem fx-left" data-s="3"><b class="plus">+</b> Interest earned, notes the bank collected, EFT receipts</div>
+        <div class="recitem fx-left" data-s="4"><b class="minus">−</b> Service fees, NSF checks, EFT payments</div>
+        <div class="recitem fx-left" data-s="6"><b class="pm">±</b> Book errors (compare "should be" to "recorded")</div>
+      </div>
+    </div>
+  </div>
+  <div class="trap" data-s="7" style="margin-top:20px"><b>Book error trap:</b> a $1,540 rent check recorded as $1,450. Your books took out $90 too <b>little</b>, so subtract $90 more from book. Dr Rent Expense 90, Cr Cash 90.</div>
+</section>
+
+<section class="slide" data-ch="6" data-id="recworked" data-title="Bank reconciliation: worked">
+  <div class="eyebrow"><span class="code">P3</span> Worked reconciliation · Oct 31</div>
+  <h2 style="margin-bottom:18px">Two different starting numbers, one true balance</h2>
+  <div class="grid2" style="gap:40px">
+    <table class="t">
+      <thead><tr><th>Bank statement</th><th class="n"></th></tr></thead>
+      <tbody>
+        <tr><td>Balance per bank</td><td class="n">12,400</td></tr>
+        <tr data-s="1"><td>+ Deposit in transit</td><td class="n">1,800</td></tr>
+        <tr data-s="2"><td>− Outstanding checks #702, #705</td><td class="n">(2,150)</td></tr>
+        <tr class="tot" data-s="7"><td>Adjusted bank balance</td><td class="n"><span data-count="12050">12,050</span></td></tr>
+      </tbody>
+    </table>
+    <table class="t">
+      <thead><tr><th>Your books</th><th class="n"></th></tr></thead>
+      <tbody>
+        <tr><td>Balance per books</td><td class="n">11,885</td></tr>
+        <tr data-s="3"><td>+ Note collected by bank</td><td class="n">400</td></tr>
+        <tr data-s="4"><td>+ Interest earned</td><td class="n">15</td></tr>
+        <tr data-s="5"><td>− NSF check from a customer</td><td class="n">(220)</td></tr>
+        <tr data-s="6"><td>− Service fee</td><td class="n">(30)</td></tr>
+        <tr class="tot" data-s="7"><td>Adjusted book balance</td><td class="n"><span data-count="12050">12,050</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="grid2" style="gap:40px;margin-top:22px">
+    <div class="tip" data-s="8" style="font-size:22px"><b>They match.</b> 12,050 is what you actually have. That's the number on the balance sheet.</div>
+    <div class="je" data-s="8" style="font-size:19px;padding:12px 18px"><div class="h">Journal entries: book side only</div>
+      Dr Cash 400 · Cr Notes Receivable 400<br>Dr Cash 15 · Cr Interest Revenue 15<br>Dr Accounts Receivable 220 · Cr Cash 220<br>Dr Misc. Expense 30 · Cr Cash 30</div>
+  </div>
+</section>
+
+<section class="slide" data-ch="6" data-poll="p3" data-title="Live check: bank rec"></section>
+
+<section class="slide" data-ch="6" data-id="dsu" data-title="Days' sales uncollected">
+  <div class="eyebrow"><span class="code">A1</span> Decision analysis</div>
+  <h2>Days' sales uncollected: how long customers sit on your money</h2>
+  <div class="formula" data-s="1">(Accounts receivable ÷ Net sales) × 365<small>The answer is a number of days. Lower is better.</small></div>
+  <div class="grid2" style="margin-top:30px;gap:40px;align-items:center">
+    <div>
+      <p data-s="2">A/R <b class="num">$36,500</b>, net sales <b class="num">$365,000</b></p>
+      <p data-s="3" class="num" style="font-size:30px">36,500 ÷ 365,000 = <b>0.1</b></p>
+      <p data-s="4" class="num" style="font-size:30px">0.1 × 365 = <b class="ac" style="font-size:44px">36.5 days</b></p>
+    </div>
+    <div class="trap" data-s="3"><b>Stop-early trap:</b> 0.1 is a fraction of a year, not days. If your answer is under 1, you forgot the × 365.</div>
+  </div>
+  <div data-s="4" style="margin-top:28px">
+    <div style="position:relative;height:56px;border:3px solid var(--ink);border-radius:10px;overflow:hidden;background:var(--card)">
+      <div id="dsuFill" style="position:absolute;inset:0 auto 0 0;width:0;background:var(--accent);transition:width 1.4s cubic-bezier(.2,.8,.2,1)"></div>
+      <div class="num" style="position:absolute;left:16px;top:12px;color:#fff;font-weight:600;font-size:20px">36.5 days to collect</div>
+    </div>
+    <div class="num muted" style="display:flex;justify-content:space-between;font-size:16px;margin-top:6px"><span>day 0</span><span>one year = 365 days</span></div>
+  </div>
+</section>
+
+<!-- ============ CHAPTER 7 ============ -->
+<section class="slide divider" data-ch="7" data-id="d7" data-title="Chapter 7">
+  <div class="big">07</div>
+  <div class="eyebrow">Chapter 7</div>
+  <h2>Receivables</h2>
+  <ul><li>C1 A/R &amp; card sales</li><li>P1 Direct write-off</li><li>P2 Allowance method</li><li>P3 Estimating bad debts</li><li>C2 Notes receivable</li><li>P4 Honored &amp; dishonored</li><li>C3 Selling &amp; pledging</li><li>A1 A/R turnover</li></ul>
+</section>
+
+<section class="slide" data-ch="7" data-id="arledger" data-title="Accounts receivable">
+  <div class="eyebrow"><span class="code">C1</span> Valuing accounts receivable</div>
+  <h2>One control account, one account per customer behind it</h2>
+  <div class="grid2" style="grid-template-columns:1fr 1fr;gap:44px">
+    <div>
+      <div style="display:grid;grid-template-columns:1fr 70px 1fr;align-items:center;gap:10px">
+        <div class="card ac" style="text-align:center"><div class="muted num" style="font-size:16px">GENERAL LEDGER</div><div style="font-size:22px">Accounts Receivable</div><div class="num" style="font-size:46px;font-weight:600;color:var(--accent)">$<span id="glAmt">4,400</span></div></div>
+        <svg viewBox="0 0 70 160" style="width:70px;height:160px"><path d="M66 30 L8 80 L66 130" fill="none" stroke="#2c5aa0" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 80 l14 -6 M8 80 l14 6" stroke="#2c5aa0" stroke-width="4" stroke-linecap="round"/></svg>
+        <div style="display:grid;gap:12px">
+          <div class="card" style="padding:14px 18px"><div class="muted num" style="font-size:14px">RIO BIKES</div><div class="num" style="font-size:24px">1,800 <span data-s="2" class="fx-fade" style="color:var(--cr)">− 1,200</span></div></div>
+          <div class="card" style="padding:14px 18px"><div class="muted num" style="font-size:14px">PALM CAFÉ</div><div class="num" style="font-size:24px">2,600 <span data-s="1" class="fx-fade" style="color:var(--dr)">+ 700</span></div></div>
+        </div>
+      </div>
+      <p class="muted" style="margin-top:20px;font-size:22px">The customer balances (the <b>subsidiary ledger</b>) must always add up to the control account. A <b>schedule of accounts receivable</b> is the list that proves it.</p>
+    </div>
+    <div style="display:grid;gap:14px;align-content:start">
+      <div class="je" data-s="1"><div class="h">Credit sale to Palm Café</div><div class="r d"><span>A/R—Palm Café</span><span class="a dv">700</span><span></span></div><div class="r c"><span>Sales</span><span></span><span class="a cv">700</span></div></div>
+      <div class="je" data-s="2"><div class="h">Rio Bikes pays part of its bill</div><div class="r d"><span>Cash</span><span class="a dv">1,200</span><span></span></div><div class="r c"><span>A/R—Rio Bikes</span><span></span><span class="a cv">1,200</span></div></div>
+      <div class="je" data-s="3"><div class="h">$800 card sale, 2% fee</div><div class="r d"><span>Cash</span><span class="a dv">784</span><span></span></div><div class="r d"><span>Credit Card Expense</span><span class="a dv">16</span><span></span></div><div class="r c"><span>Sales</span><span></span><span class="a cv">800</span></div><div class="m">Sales is the full price. The fee is a selling expense. The card company takes the risk the customer won't pay.</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-ch="7" data-poll="p4" data-title="Live check: card sale"></section>
+
+<section class="slide" data-ch="7" data-id="twomethods" data-title="Direct write-off vs allowance">
+  <div class="eyebrow"><span class="code">P1</span> <span class="code">P2</span> Bad debts</div>
+  <h2>Some customers never pay. When do you record that?</h2>
+  <div class="grid2" style="gap:40px">
+    <div class="card" data-s="1">
+      <h3 style="color:var(--ink)">Direct write-off: wait</h3>
+      <p>Record the expense only when a specific account is clearly dead.</p>
+      <div class="je" style="font-size:21px"><div class="r d"><span>Bad Debts Expense</span><span class="a dv">350</span><span></span></div><div class="r c"><span>A/R—D. Ortiz</span><span></span><span class="a cv">350</span></div></div>
+      <p class="muted" style="font-size:21px;margin-top:12px">Simple, but the expense lands in a <b>later period</b> than the sale. That breaks matching (expense recognition).</p>
+      <div class="pill" data-s="2" style="font-size:16px">Allowed only when bad debts are immaterial</div>
+    </div>
+    <div class="card ac" data-s="3" style="border-width:3px">
+      <h3>Allowance: estimate now</h3>
+      <p>At year-end, estimate how much won't come in, and record it in the <b>same period</b> as the sales.</p>
+      <div class="je" style="font-size:21px"><div class="h">Dec 31 adjusting entry</div><div class="r d"><span>Bad Debts Expense</span><span class="a dv">1,800</span><span></span></div><div class="r c"><span>Allowance</span><span></span><span class="a cv">1,800</span></div></div>
+      <p style="font-size:21px;margin-top:12px">You don't credit A/R: you don't know <i>which</i> customers yet. The Allowance is a <b class="ac">contra asset</b> with a credit balance.</p>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-ch="7" data-id="writeoff" data-title="Writing off under the allowance method">
+  <div class="eyebrow"><span class="code">P2</span> Allowance method</div>
+  <h2>Drag to write off a customer. Watch what doesn't move.</h2>
+  <div class="grid2" style="grid-template-columns:1fr 520px;gap:44px">
+    <div>
+      <label for="woR" style="font-size:22px">Write off a specific account: <b class="num" id="woV">$0</b></label>
+      <input type="range" id="woR" min="0" max="1800" step="50" value="0">
+      <div id="woBar" style="display:flex;height:70px;border-radius:10px;overflow:hidden;border:3px solid var(--ink);margin-top:14px;font:600 20px var(--mono)"></div>
+      <div id="woLeg" class="num muted" style="display:flex;justify-content:space-between;font-size:17px;margin-top:8px"></div>
+      <table class="t" style="margin-top:16px"><tbody id="woTbl"></tbody></table>
+    </div>
+    <div style="display:grid;gap:16px;align-content:start">
+      <div class="je"><div class="h">The write-off entry</div><div class="r d"><span>Allowance</span><span class="a dv" id="woJ1">0</span><span></span></div><div class="r c"><span>A/R</span><span></span><span class="a cv" id="woJ2">0</span></div><div class="m">No Bad Debts Expense. It was recorded back at year-end.</div></div>
+      <div class="rule"><span class="lab">Key idea</span>A write-off changes <b>nothing</b> that matters: realizable value, total assets and net income all stay put. A/R and the Allowance drop together.</div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-ch="7" data-poll="p5" data-title="Live check: write-off"></section>
+
+<section class="slide" data-ch="7" data-id="recovery" data-title="Recoveries, side by side">
+  <div class="eyebrow"><span class="code">P1</span> <span class="code">P2</span> Every bad-debt entry</div>
+  <h2>The customer pays after all: reinstate, then collect</h2>
+  <table class="t" style="font-size:24px">
+    <thead><tr><th>Event</th><th>Direct write-off</th><th>Allowance method</th></tr></thead>
+    <tbody>
+      <tr data-s="1"><td>Year-end</td><td class="muted">Nothing</td><td>Dr Bad Debts Exp. · Cr Allowance</td></tr>
+      <tr data-s="2"><td>Write off a customer</td><td>Dr <b>Bad Debts Exp.</b> · Cr A/R</td><td>Dr <b class="ac">Allowance</b> · Cr A/R</td></tr>
+      <tr data-s="3"><td>Recovery, step 1: reinstate</td><td>Dr A/R · Cr Bad Debts Exp.</td><td>Dr A/R · Cr <b class="ac">Allowance</b></td></tr>
+      <tr data-s="3"><td>Recovery, step 2: collect</td><td>Dr Cash · Cr A/R</td><td>Dr Cash · Cr A/R</td></tr>
+      <tr data-s="4"><td>When is the expense?</td><td>When the account dies</td><td><b>Same period as the sale</b></td></tr>
+    </tbody>
+  </table>
+  <div class="grid2" style="margin-top:22px;gap:30px">
+    <div class="tip" data-s="3" style="font-size:22px"><b>Why reinstate first?</b> So the customer's history shows they paid. That matters next time they ask for credit.</div>
+    <div class="trap" data-s="5" style="font-size:22px"><b>Fast test:</b> under the allowance method, Bad Debts Expense appears <b>only</b> in the year-end adjustment. Never in a write-off or recovery.</div>
+  </div>
+</section>
+
+<section class="slide" data-ch="7" data-id="tank" data-title="Estimating bad debts">
+  <div class="eyebrow"><span class="code">P3</span> Estimating bad debts</div>
+  <h2>Two methods. One gives the expense, one gives the target.</h2>
+  <div class="grid2" style="grid-template-columns:470px 1fr;gap:40px">
+    <div style="display:grid;gap:16px;align-content:start">
+      <div class="card" data-s="1"><h3 style="color:var(--ink)">Percent of sales</h3><p style="font-size:21px;margin:0">Income statement approach. Credit sales × % <b>is</b> the expense. <b>Ignore</b> the allowance's current balance.</p><p class="num" style="font-size:20px;margin:10px 0 0">480,000 × 0.5% = <b>2,400</b> expense</p></div>
+      <div class="card ac" data-s="2" style="border-width:3px"><h3>Percent of receivables</h3><p style="font-size:21px;margin:0">Balance sheet approach. A/R × % (or an aging schedule) is where the allowance must <b>end</b>. The entry is the plug to get there.</p></div>
+    </div>
+    <div data-s="2" style="display:grid;grid-template-columns:330px 1fr;gap:26px;align-items:center">
+      <svg id="tankSvg" viewBox="0 0 330 520" style="width:330px;height:520px" aria-label="Allowance balance tank"></svg>
+      <div style="display:grid;gap:16px">
+        <p class="num" style="font-size:22px;margin:0">A/R 80,000 × 3% = <b>2,400</b> target</p>
+        <div class="seg" id="tankSeg" role="group" aria-label="Unadjusted balance"><button type="button" data-v="500" aria-pressed="true">$500 credit</button><button type="button" data-v="-500" aria-pressed="false">$500 debit</button></div>
+        <div class="rule" id="tankOut" style="font-size:24px"></div>
+        <p class="muted" style="font-size:20px;margin:0">A debit balance means last year's write-offs used up more than the reserve. You have to refill the hole first.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-ch="7" data-id="aging" data-title="Aging of receivables">
+  <div class="eyebrow"><span class="code">P3</span> Aging of receivables</div>
+  <h2>The older the balance, the less likely it gets paid</h2>
+  <div class="grid2" style="grid-template-columns:1fr 440px;gap:40px">
+    <table class="t">
+      <thead><tr><th>Age group</th><th class="n">Receivables</th><th class="n">% bad</th><th class="n">Estimate</th></tr></thead>
+      <tbody>
+        <tr data-s="1"><td>Not yet due</td><td class="n">42,000</td><td class="n">1%</td><td class="n">420</td></tr>
+        <tr data-s="2"><td>1–30 days past due</td><td class="n">9,000</td><td class="n">4%</td><td class="n">360</td></tr>
+        <tr data-s="3"><td>31–60 days past due</td><td class="n">4,500</td><td class="n">10%</td><td class="n">450</td></tr>
+        <tr data-s="4"><td>61–90 days past due</td><td class="n">2,000</td><td class="n">25%</td><td class="n">500</td></tr>
+        <tr data-s="5"><td>Over 90 days past due</td><td class="n">1,200</td><td class="n">50%</td><td class="n">600</td></tr>
+        <tr class="tot" data-s="6"><td>Total</td><td class="n">58,700</td><td class="n"></td><td class="n"><span data-count="2330">2,330</span></td></tr>
+      </tbody>
+    </table>
+    <div style="display:grid;gap:16px;align-content:start">
+      <div class="tip" data-s="6" style="font-size:22px">2,330 is the <b>target</b> ending allowance, not the entry.</div>
+      <div class="je" data-s="7" style="font-size:19px"><div class="h">Allowance already has $400 credit</div><div class="r d"><span>Bad Debts Expense</span><span class="a dv">1,930</span><span></span></div><div class="r c"><span>Allowance</span><span></span><span class="a cv">1,930</span></div><div class="m">2,330 − 400 = 1,930</div></div>
+      <p class="muted" data-s="7" style="font-size:21px">Aging is usually the most reliable estimate because it looks at actual accounts.</p>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-ch="7" data-poll="p6" data-title="Live check: allowance"></section>
+
+<section class="slide" data-ch="7" data-id="notes" data-title="Notes receivable">
+  <div class="eyebrow"><span class="code">C2</span> Notes receivable</div>
+  <h2>A written promise to pay, with interest</h2>
+  <div class="grid2" style="gap:44px">
+    <div style="display:grid;gap:12px;align-content:start">
+      <div class="card" data-s="1" style="padding:16px 22px"><b>Maker</b> signs and promises to pay. To them it's a note <i>payable</i>.</div>
+      <div class="card" data-s="1" style="padding:16px 22px"><b>Payee</b> gets paid. To them it's a note <i>receivable</i>.</div>
+      <div class="card" data-s="2" style="padding:16px 22px"><b>Principal</b> is the face amount. <b>Maturity value</b> = principal + interest.</div>
+      <div class="tip" data-s="2" style="font-size:21px">Why take a note? It's stronger in court than an invoice, and it earns interest.</div>
+    </div>
+    <div style="display:grid;gap:18px;align-content:start">
+      <div class="formula" data-s="3">Principal × Rate × Time<small>Time = days ÷ 360, or months ÷ 12</small></div>
+      <div data-s="4" class="card ac">
+        <div class="muted num" style="font-size:16px">$4,000 · 9% · 90 DAYS</div>
+        <div class="num" style="font-size:30px;line-height:1.7;margin-top:6px">
+          <div data-s="4">4,000 × 9% = 360 <span class="muted" style="font-size:20px">a full year</span></div>
+          <div data-s="5">360 × 90/360 = 360 × ¼ = <b class="ac" style="font-size:40px">90</b></div>
+        </div>
+        <p data-s="6" style="margin:8px 0 0;font-size:22px">Maturity value: <b class="num">4,090</b></p>
+      </div>
+      <p class="muted" data-s="5" style="font-size:20px">No calculator trick: get the full year's interest first, then take the fraction.</p>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-ch="7" data-id="maturity" data-title="Maturity dates">
+  <div class="eyebrow"><span class="code">C2</span> Counting days</div>
+  <h2>A 90-day note signed March 18. When is it due?</h2>
+  <div class="rule" style="margin-bottom:28px"><span class="lab">The rule</span>Don't count the day it's signed. Do count the day it's due.</div>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:18px" id="matRow">
+    <div class="card" data-s="1"><div class="pill">March</div><p class="num" style="font-size:24px;margin:12px 0 0">31 − 18 = <b>13</b> left</p><div class="mbar"><i style="--w:43%"></i></div><p class="num muted" style="margin:6px 0 0;font-size:20px">running: 13</p></div>
+    <div class="card" data-s="2"><div class="pill">April</div><p class="num" style="font-size:24px;margin:12px 0 0">all <b>30</b></p><div class="mbar"><i style="--w:100%"></i></div><p class="num muted" style="margin:6px 0 0;font-size:20px">running: 43</p></div>
+    <div class="card" data-s="3"><div class="pill">May</div><p class="num" style="font-size:24px;margin:12px 0 0">all <b>31</b></p><div class="mbar"><i style="--w:100%"></i></div><p class="num muted" style="margin:6px 0 0;font-size:20px">running: 74</p></div>
+    <div class="card ac" data-s="4" style="border-width:3px"><div class="pill">June</div><p class="num" style="font-size:24px;margin:12px 0 0">need 90 − 74 = <b>16</b></p><div class="mbar"><i style="--w:53%"></i></div><p class="num" style="margin:6px 0 0;font-size:26px;color:var(--accent);font-weight:600">Due June 16</p></div>
+  </div>
+  <div class="tip" data-s="5" style="margin-top:26px">Notes written in <b>months</b> are easier: a 3-month note signed March 18 is due June 18, the same day number.</div>
+</section>
+
+<section class="slide" data-ch="7" data-id="honored" data-title="Honored vs dishonored">
+  <div class="eyebrow"><span class="code">P4</span> At maturity</div>
+  <h2>The maker pays, or doesn't</h2>
+  <div class="seg" id="honSeg" role="group" aria-label="Outcome" style="align-self:flex-start;margin-bottom:22px"><button type="button" data-v="h" aria-pressed="true">Honored: paid</button><button type="button" data-v="d" aria-pressed="false">Dishonored: not paid</button></div>
+  <div class="grid2" style="grid-template-columns:1fr 1fr;gap:40px">
+    <div class="je" id="honJE" style="font-size:30px;padding:24px 28px"></div>
+    <div id="honTxt" style="display:grid;gap:16px;align-content:start"></div>
+  </div>
+</section>
+
+<section class="slide" data-ch="7" data-id="accrual" data-title="Interest across year-end">
+  <div class="eyebrow"><span class="code">P4</span> Year-end interest</div>
+  <h2>A note that crosses December 31</h2>
+  <p class="lead">$6,000, 60-day, 10% note signed December 1. Total interest: 6,000 × 10% × 60/360 = <b class="num" style="color:var(--ink)">$100</b>.</p>
+  <svg viewBox="0 0 1380 190" style="width:1380px;height:190px" aria-label="Timeline">
+    <line x1="40" y1="110" x2="1340" y2="110" stroke="#cfdacf" stroke-width="10" stroke-linecap="round"/>
+    <line id="acc1" x1="40" y1="110" x2="40" y2="110" stroke="#7b8fc4" stroke-width="10" stroke-linecap="round" style="transition:all 1s ease"/>
+    <line id="acc2" x1="690" y1="110" x2="690" y2="110" stroke="#2c5aa0" stroke-width="10" stroke-linecap="round" style="transition:all 1s ease"/>
+    <g><circle cx="40" cy="110" r="14" fill="#14202e"/><text x="26" y="168" text-anchor="start" font-family="IBM Plex Mono" font-size="22" fill="#14202e">Dec 1 · signed</text></g>
+    <g data-s="1"><circle cx="690" cy="110" r="14" fill="#14202e"/><text x="690" y="168" text-anchor="middle" font-family="IBM Plex Mono" font-size="22" fill="#14202e">Dec 31 · accrue</text><text x="365" y="70" text-anchor="middle" font-family="IBM Plex Mono" font-weight="600" font-size="24" fill="#5e6fa0">30 days = $50 this year</text></g>
+    <g data-s="2"><circle cx="1340" cy="110" r="14" fill="#14202e"/><text x="1340" y="168" text-anchor="end" font-family="IBM Plex Mono" font-size="22" fill="#14202e">Jan 30 · paid</text><text x="1015" y="70" text-anchor="middle" font-family="IBM Plex Mono" font-weight="600" font-size="24" fill="#2c5aa0">30 days = $50 next year</text></g>
+  </svg>
+  <div class="grid2" style="gap:40px;margin-top:10px">
+    <div class="je" data-s="1"><div class="h">Dec 31 adjusting entry</div><div class="r d"><span>Interest Receivable</span><span class="a dv">50</span><span></span></div><div class="r c"><span>Interest Revenue</span><span></span><span class="a cv">50</span></div></div>
+    <div class="je" data-s="2"><div class="h">Jan 30 collection</div><div class="r d"><span>Cash</span><span class="a dv">6,100</span><span></span></div><div class="r c"><span>Interest Receivable</span><span></span><span class="a cv">50</span></div><div class="r c"><span>Interest Revenue</span><span></span><span class="a cv">50</span></div><div class="r c"><span>Notes Receivable</span><span></span><span class="a cv">6,000</span></div></div>
+  </div>
+</section>
+
+<section class="slide" data-ch="7" data-poll="p7" data-title="Live check: interest"></section>
+
+<section class="slide" data-ch="7" data-id="selling" data-title="Selling and pledging receivables">
+  <div class="eyebrow"><span class="code">C3</span> Cash before customers pay</div>
+  <h2>Sell them, or borrow against them</h2>
+  <div class="grid2" style="gap:40px">
+    <div class="card" data-s="1">
+      <h3>Selling (factoring)</h3>
+      <p style="font-size:22px">A factor buys the receivables and collects them. You pay a fee, get cash now, and the bad-debt risk moves to the factor.</p>
+      <div class="je" style="font-size:21px"><div class="h">Sell $30,000 of A/R, 3% fee</div><div class="r d"><span>Cash</span><span class="a dv">29,100</span><span></span></div><div class="r d"><span>Factoring Fee Expense</span><span class="a dv">900</span><span></span></div><div class="r c"><span>Accounts Receivable</span><span></span><span class="a cv">30,000</span></div></div>
+    </div>
+    <div class="card" data-s="2">
+      <h3>Pledging</h3>
+      <p style="font-size:22px">Borrow money with the receivables as security. They <b>stay on your books</b>. You disclose the pledge in the notes.</p>
+      <div class="je" style="font-size:21px"><div class="h">Borrow $20,000</div><div class="r d"><span>Cash</span><span class="a dv">20,000</span><span></span></div><div class="r c"><span>Notes Payable</span><span></span><span class="a cv">20,000</span></div><div class="m">A/R isn't touched.</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-ch="7" data-id="arturn" data-title="Accounts receivable turnover">
+  <div class="eyebrow"><span class="code">A1</span> Decision analysis</div>
+  <h2>A/R turnover: how many times a year receivables become cash</h2>
+  <div class="formula" data-s="1">Net sales ÷ Average A/R<small>Average = (beginning + ending) ÷ 2. Higher is better.</small></div>
+  <div class="grid2" style="gap:40px;margin-top:28px;align-items:center">
+    <div>
+      <p data-s="2" class="num" style="font-size:28px">Average A/R = (40,000 + 50,000) ÷ 2 = <b>45,000</b></p>
+      <p data-s="3" class="num" style="font-size:28px">540,000 ÷ 45,000 = <b class="ac" style="font-size:44px">12 times</b></p>
+      <p data-s="5" style="font-size:23px">Links back to Ch 6: 365 ÷ 12 ≈ <b>30 days</b> to collect, the same idea as days' sales uncollected.</p>
+    </div>
+    <div data-s="4" id="turnDots" style="display:grid;grid-template-columns:repeat(6,1fr);gap:14px"></div>
+  </div>
+</section>
+
+<!-- ============ CHAPTER 8 ============ -->
+<section class="slide divider" data-ch="8" data-id="d8" data-title="Chapter 8">
+  <div class="big">08</div>
+  <div class="eyebrow">Chapter 8</div>
+  <h2>Long-Term Assets</h2>
+  <ul><li>C1 Cost</li><li>P1 Depreciation</li><li>C2 Partial years &amp; estimates</li><li>C3 Repairs vs. improvements</li><li>P2 Disposals</li><li>P3 Natural resources</li><li>P4 Intangibles</li><li>A1 Total asset turnover</li></ul>
+</section>
+
+<section class="slide" data-ch="8" data-id="life" data-title="Life of a long-term asset">
+  <div class="eyebrow">Big picture</div>
+  <h2>Every long-term asset lives the same three-part life</h2>
+  <div style="display:grid;grid-template-columns:1fr 60px 1fr 60px 1fr;align-items:stretch;gap:0">
+    <div class="card ac" data-s="1"><div class="pill">Acquire</div><p style="margin:12px 0 0">Work out its full <b>cost</b> and put it on the balance sheet.</p></div>
+    <div data-s="2" class="arrowcell">→</div>
+    <div class="card ac" data-s="2"><div class="pill">Use</div><p style="margin:12px 0 0">Spread that cost to expense over the years it helps earn revenue.</p></div>
+    <div data-s="3" class="arrowcell">→</div>
+    <div class="card ac" data-s="3"><div class="pill">Dispose</div><p style="margin:12px 0 0">Discard, sell, or trade it in. Record any <b>gain or loss</b>.</p></div>
+  </div>
+  <table class="t" style="margin-top:30px">
+    <thead><tr><th>Kind</th><th>Examples</th><th>Cost spread out by</th><th>Contra account</th></tr></thead>
+    <tbody>
+      <tr data-s="4"><td><b>Plant assets</b></td><td>Machines, buildings, vans</td><td><b class="ac">Depreciation</b> (never land)</td><td>Accumulated Depreciation</td></tr>
+      <tr data-s="5"><td><b>Natural resources</b></td><td>Mines, timber, oil</td><td><b class="ac">Depletion</b></td><td>Accumulated Depletion</td></tr>
+      <tr data-s="6"><td><b>Intangibles</b></td><td>Patents, copyrights, franchises</td><td><b class="ac">Amortization</b></td><td>Accumulated Amortization</td></tr>
+    </tbody>
+  </table>
+  <p class="muted" data-s="7" style="margin-top:18px;font-size:22px">Plant assets must be <b style="color:var(--ink)">used in operations</b> and last <b style="color:var(--ink)">more than one period</b>. A truck held for resale is inventory. Land held for a future store is an investment.</p>
+</section>
+
+<section class="slide" data-ch="8" data-id="costsort" data-title="What goes into cost">
+  <div class="eyebrow"><span class="code">C1</span> Cost determination</div>
+  <h2>Normal, reasonable, and necessary to get it ready</h2>
+  <div class="grid2" style="grid-template-columns:1fr 1fr;gap:34px">
+    <div class="card ac" style="border-width:3px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline"><h3>Machinery account</h3><span class="num" style="font-size:34px;font-weight:600;color:var(--accent)">$<span id="csTot">0</span></span></div>
+      <div style="display:grid;gap:8px;margin-top:6px">
+        <div class="citem fx-right" data-s="1"><span>Invoice price</span><b class="num">48,000</b></div>
+        <div class="citem fx-right" data-s="2"><span>Sales tax</span><b class="num">2,880</b></div>
+        <div class="citem fx-right" data-s="3"><span>Early-payment discount taken</span><b class="num" style="color:var(--cr)">(960)</b></div>
+        <div class="citem fx-right" data-s="4"><span>Freight in (FOB shipping point)</span><b class="num">1,200</b></div>
+        <div class="citem fx-right" data-s="5"><span>Installation</span><b class="num">1,500</b></div>
+        <div class="citem fx-right" data-s="6"><span>Test run before going live</span><b class="num">420</b></div>
+      </div>
+    </div>
+    <div style="display:grid;gap:16px;align-content:start">
+      <div class="card">
+        <h3 style="color:var(--cr)">Expense, not cost</h3>
+        <div style="display:grid;gap:8px;margin-top:6px">
+          <div class="citem bad fx-left" data-s="7"><span>Repair after your crew dropped it</span><b class="num">650</b></div>
+          <div class="citem bad fx-left" data-s="8"><span>Replacement belts after 3 months</span><b class="num">300</b></div>
+        </div>
+      </div>
+      <div class="tip" data-s="7" style="font-size:21px">Mistakes aren't <b>necessary</b>. Anything after it's running is maintenance.</div>
+      <div class="rule" data-s="9" style="font-size:24px"><span class="lab">Entry</span>Dr Machinery 53,040 · Cr Cash 53,040</div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-ch="8" data-id="land" data-title="Land, improvements, buildings">
+  <div class="eyebrow"><span class="code">C1</span> Land and buildings</div>
+  <h2>Land never wears out, so it never depreciates</h2>
+  <table class="t">
+    <thead><tr><th style="width:240px">Account</th><th>Includes</th><th style="width:220px">Depreciate?</th></tr></thead>
+    <tbody>
+      <tr data-s="1"><td><b>Land</b></td><td>Price, commissions, title and legal fees, back taxes you agree to pay, surveying, grading, and <b>tearing down an old building</b> (minus salvage sold)</td><td><b style="color:var(--cr)">Never</b></td></tr>
+      <tr data-s="2"><td><b>Land improvements</b></td><td>Parking lots, driveways, fences, outdoor lighting</td><td>Yes</td></tr>
+      <tr data-s="3"><td><b>Buildings</b></td><td>Price or construction cost, permits, architect fees, repairs to get a bought building ready</td><td>Yes</td></tr>
+    </tbody>
+  </table>
+  <div class="je" data-s="4" style="margin-top:20px;max-width:860px"><div class="h">Land for a new store</div>
+    <div class="r"><span>Price</span><span></span><span class="a">220,000</span></div>
+    <div class="r"><span>Remove garage (21,000 − 3,000 scrap)</span><span></span><span class="a">18,000</span></div>
+    <div class="r"><span>Commission and title fees</span><span></span><span class="a">8,700</span></div>
+    <div class="r" style="border-top:2px solid var(--ink);margin-top:4px"><span><b>Cost of land</b></span><span></span><span class="a"><b>246,700</b></span></div>
+  </div>
+</section>
+
+<section class="slide" data-ch="8" data-poll="p8" data-title="Live check: land"></section>
+
+<section class="slide" data-ch="8" data-id="lumpsum" data-title="Lump-sum purchases">
+  <div class="eyebrow"><span class="code">C1</span> Lump-sum (basket) purchase</div>
+  <h2>One price, three assets: split by appraised value</h2>
+  <p class="lead">Pay <b class="num" style="color:var(--ink)">$300,000</b> for land, a building and equipment appraised at <b class="num" style="color:var(--ink)">$320,000</b> total.</p>
+  <div class="lsrow" data-s="1"><span class="lslab">Appraised</span><div class="lsbar" id="lsA"></div></div>
+  <div class="lsrow" data-s="2"><span class="lslab">Share</span><div class="lsbar" id="lsS"></div></div>
+  <div class="lsrow" data-s="3"><span class="lslab">Recorded cost</span><div class="lsbar" id="lsC"></div></div>
+  <div class="grid2" style="margin-top:24px;gap:30px">
+    <div class="tip" data-s="3" style="font-size:22px">No calculator: 80/320 = ¼, 200/320 = ⅝, 40/320 = ⅛. Then ¼ of 300,000 = 75,000, and so on.</div>
+    <div class="trap" data-s="4" style="font-size:22px"><b>Trap:</b> recording appraised values. You paid $300,000, so the three costs must add to $300,000.</div>
+  </div>
+</section>
+
+<section class="slide" data-ch="8" data-id="depchart" data-title="Three depreciation methods">
+  <div class="eyebrow"><span class="code">P1</span> Depreciation</div>
+  <h2 style="margin-bottom:14px">One delivery van, three methods</h2>
+  <p class="lead" style="font-size:23px;margin-bottom:16px">Cost <b class="num" style="color:var(--ink)">36,000</b> · salvage <b class="num" style="color:var(--ink)">4,000</b> · life 4 years or 80,000 miles (24k, 22k, 18k, 16k). Depreciation spreads <b style="color:var(--ink)">cost</b>, it doesn't track market value.</p>
+  <div class="grid2" style="grid-template-columns:760px 1fr;gap:40px">
+    <div>
+      <div class="seg" id="depSeg" role="group" aria-label="Method"><button type="button" data-v="sl" aria-pressed="true">Straight-line</button><button type="button" data-v="uop" aria-pressed="false">Units-of-production</button><button type="button" data-v="ddb" aria-pressed="false">Double-declining</button></div>
+      <div id="depSvg" class="depchart" aria-label="Book value by year"></div><div id="depX" class="depx"></div>
+    </div>
+    <div style="display:grid;gap:14px;align-content:start">
+      <div class="formula" id="depF" style="font-size:26px"></div>
+      <table class="t" style="font-size:22px"><thead><tr><th>Year</th><th class="n">Expense</th><th class="n">Book value</th></tr></thead><tbody id="depT"></tbody></table>
+      <div class="tip" style="font-size:20px;padding:12px 18px">Every method ends at salvage and totals <b class="num">32,000</b>. Only the timing changes.</div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-ch="8" data-id="ddb" data-title="Double-declining, step by step">
+  <div class="eyebrow"><span class="code">P1</span> Double-declining-balance</div>
+  <h2>DDB: rate × beginning book value, then stop at salvage</h2>
+  <div class="grid2" style="grid-template-columns:1fr 470px;gap:40px">
+    <table class="t">
+      <thead><tr><th>Year</th><th class="n">Beginning BV</th><th class="n">× 50%</th><th class="n">Ending BV</th></tr></thead>
+      <tbody>
+        <tr data-s="2"><td>1</td><td class="n">36,000</td><td class="n">18,000</td><td class="n">18,000</td></tr>
+        <tr data-s="3"><td>2</td><td class="n">18,000</td><td class="n">9,000</td><td class="n">9,000</td></tr>
+        <tr data-s="4"><td>3</td><td class="n">9,000</td><td class="n">4,500</td><td class="n">4,500</td></tr>
+        <tr data-s="5" style="background:var(--crs)"><td>4</td><td class="n">4,500</td><td class="n"><s class="muted">2,250</s> <b>500</b></td><td class="n"><b>4,000</b></td></tr>
+      </tbody>
+    </table>
+    <div style="display:grid;gap:14px;align-content:start">
+      <div class="formula" data-s="1" style="font-size:25px">Rate = 2 ÷ 4 years = 50%</div>
+      <div class="trap" data-s="3" style="font-size:21px"><b>Trap 1:</b> multiply by <b>book value</b>, not cost − salvage. Salvage is ignored in the multiplication.</div>
+      <div class="trap" data-s="5" style="font-size:21px"><b>Trap 2:</b> year 4's formula says 2,250, which would drop below salvage. Take only 4,500 − 4,000 = 500.</div>
+    </div>
+  </div>
+  <p class="muted" data-s="6" style="margin-top:22px;font-size:21px">For taxes, companies often use <b style="color:var(--ink)">MACRS</b>, an accelerated system that ignores salvage. It isn't allowed in the financial statements, so books and taxes can differ.</p>
+</section>
+
+<section class="slide" data-ch="8" data-poll="p9" data-title="Live check: DDB"></section>
+
+<section class="slide" data-ch="8" data-id="estimates" data-title="Partial years and changes in estimates">
+  <div class="eyebrow"><span class="code">C2</span> Partial years · changes in estimates</div>
+  <h2>When the numbers don't fit neatly</h2>
+  <div class="grid2" style="gap:40px">
+    <div class="card" data-s="1">
+      <h3>Bought mid-year</h3>
+      <p>Van bought <b>April 1</b>, straight-line $8,000 a year. April through December is 9 months.</p>
+      <p class="num" style="font-size:30px">8,000 × 9/12 = <b class="ac">6,000</b></p>
+      <p class="muted" style="font-size:20px;margin:0">Bought on the 1st–15th: count that month. On the 16th or later: start next month.</p>
+    </div>
+    <div class="card ac" data-s="2" style="border-width:3px">
+      <h3>New estimate after 2 years</h3>
+      <p style="font-size:22px">Book value is 36,000 − 16,000 = 20,000. Now you expect <b>3 more</b> years and a <b>$2,000</b> salvage.</p>
+      <div id="estBar" style="display:flex;height:54px;border-radius:8px;overflow:hidden;border:3px solid var(--ink);font:600 17px var(--mono);margin:6px 0 10px">
+        <div style="flex:16;background:#d9c2a4;display:grid;place-items:center">used 16,000</div>
+        <div style="flex:18;background:var(--accent);color:#fff;display:grid;place-items:center" data-s="3" class="fx-fade">18,000 ÷ 3</div>
+        <div style="flex:2;background:#efe4d4;display:grid;place-items:center" data-s="3" class="fx-fade">2k</div>
+      </div>
+      <p class="num" style="font-size:28px;margin:0" data-s="3">(20,000 − 2,000) ÷ 3 = <b class="ac">6,000</b> a year</p>
+    </div>
+  </div>
+  <div class="trap" data-s="4" style="margin-top:22px"><b>Never go back and fix past years.</b> Start from today's book value and depreciate forward.</div>
+</section>
+
+<section class="slide" data-ch="8" data-id="caprev" data-title="Expense it or capitalize it">
+  <div class="eyebrow"><span class="code">C3</span> Additional expenditures</div>
+  <h2>Click each card: expense it, or add it to the asset?</h2>
+  <div class="rule" style="margin-bottom:20px;font-size:24px"><span class="lab">Quick test</span>Only keeps it working the way it already did → <b>expense</b> (revenue expenditure). Makes it better, bigger or last longer → <b>capitalize</b> (betterment or extraordinary repair).</div>
+  <div id="flipGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px"></div>
+</section>
+
+<section class="slide" data-ch="8" data-id="disposal" data-title="Disposals">
+  <div class="eyebrow"><span class="code">P2</span> Disposals</div>
+  <h2 style="margin-bottom:18px">Selling a plant asset in four steps</h2>
+  <div class="grid2" style="grid-template-columns:520px 1fr;gap:40px">
+    <div style="display:grid;gap:10px;align-content:start">
+      <div class="stepc" data-s="1"><b>1</b><span><b>Update depreciation</b> to the sale date. Equipment: cost 30,000, accum. 21,000 at Dec 31, 6,000/yr. Sold July 1 → 6 months = <b class="num">3,000</b>.</span></div>
+      <div class="stepc" data-s="2"><b>2</b><span><b>Remove the asset.</b> Credit it at cost, debit all 24,000 of accumulated depreciation.</span></div>
+      <div class="stepc" data-s="3"><b>3</b><span><b>Record what you got.</b> Usually cash.</span></div>
+      <div class="stepc" data-s="4"><b>4</b><span><b>Plug the gain or loss:</b> received − book value (30,000 − 24,000 = <b class="num">6,000</b>).</span></div>
+    </div>
+    <div data-s="4" style="display:grid;gap:12px;align-content:start">
+      <label for="dsR" style="font-size:22px">Sale price: <b class="num" id="dsV">$7,500</b></label>
+      <input type="range" id="dsR" min="3000" max="9000" step="250" value="7500">
+      <div class="gauge"><div class="gz"></div><div class="gm" id="dsM"></div><span class="g0">book value 6,000</span></div>
+      <div class="je" id="dsJE" style="font-size:21px"></div>
+      <div class="trap" style="font-size:20px;padding:12px 18px"><b>Skip step 1</b> and book value looks like 9,000. Every gain or loss comes out 3,000 off.</div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-ch="8" data-poll="p10" data-title="Live check: disposal"></section>
+
+<section class="slide" data-ch="8" data-id="depletion" data-title="Natural resources">
+  <div class="eyebrow"><span class="code">P3</span> Depletion</div>
+  <h2>Depletion works like units-of-production</h2>
+  <div class="grid2" style="grid-template-columns:1fr 1fr;gap:40px">
+    <div style="display:grid;gap:14px;align-content:start">
+      <p style="margin:0">Gravel quarry: <b class="num">960,000</b> (price + access road). Land worth <b class="num">60,000</b> afterward. Holds <b class="num">300,000</b> tons.</p>
+      <div class="formula" data-s="1" style="font-size:27px">(960,000 − 60,000) ÷ 300,000 = $3/ton</div>
+      <p data-s="2" style="margin:6px 0 0">Year 1: <b>70,000</b> tons dug out, only <b>55,000</b> sold.</p>
+      <div class="trap" data-s="4" style="font-size:21px"><b>Trap:</b> expensing every ton extracted. Unsold tons are still inventory, a current asset.</div>
+    </div>
+    <div style="display:grid;gap:14px;align-content:start">
+      <div data-s="2">
+        <div class="num muted" style="font-size:16px;margin-bottom:6px">THE QUARRY · 300,000 TONS</div>
+        <div style="display:flex;height:62px;border:3px solid var(--ink);border-radius:10px;overflow:hidden;font:600 17px var(--mono)">
+          <div class="qseg" data-s="3" style="flex:55;background:var(--accent);color:#fff">sold 55k</div>
+          <div class="qseg" data-s="3" style="flex:15;background:#e3b98a">15k</div>
+          <div style="flex:230;background:repeating-linear-gradient(45deg,#f3e5d4 0 10px,#fff 10px 20px);display:grid;place-items:center;color:var(--muted)">still in the ground</div>
+        </div>
+      </div>
+      <div class="je" data-s="3" style="font-size:21px"><div class="h">Dec 31</div><div class="r d"><span>Depletion Expense</span><span class="a dv">165,000</span><span></span></div><div class="r d"><span>Gravel Inventory</span><span class="a dv">45,000</span><span></span></div><div class="r c"><span>Accum. Depletion</span><span></span><span class="a cv">210,000</span></div><div class="m">55,000 × $3 to expense. 15,000 × $3 waits in inventory until sold.</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-ch="8" data-id="intangibles" data-title="Intangible assets">
+  <div class="eyebrow"><span class="code">P4</span> Intangibles</div>
+  <h2>No physical form, still worth money</h2>
+  <div class="grid2" style="grid-template-columns:1fr 440px;gap:36px">
+    <table class="t" style="font-size:21px">
+      <thead><tr><th>Type</th><th>What it is</th><th>Amortize?</th></tr></thead>
+      <tbody>
+        <tr data-s="1"><td><b>Patent</b></td><td>Exclusive right to an invention, 20 years</td><td>Over useful life</td></tr>
+        <tr data-s="1"><td><b>Copyright</b></td><td>Creator's life + 70 years</td><td>Over useful life</td></tr>
+        <tr data-s="2"><td><b>Franchise</b></td><td>Right to sell under set terms</td><td>Over the agreement</td></tr>
+        <tr data-s="2"><td><b>Trademark</b></td><td>Only a <b>purchased</b> one is recorded</td><td>Unless renewed indefinitely</td></tr>
+        <tr data-s="3" style="background:var(--accent-s)"><td><b>Goodwill</b></td><td>Price paid for a company above the fair value of its net assets</td><td><b style="color:var(--cr)">Never</b>. Impairment test.</td></tr>
+        <tr data-s="4"><td><b>Leasehold impr.</b></td><td>Your improvements to rented space</td><td>Shorter of lease or life</td></tr>
+      </tbody>
+    </table>
+    <div style="display:grid;gap:14px;align-content:start">
+      <div class="je" data-s="1" style="font-size:20px"><div class="h">$60,000 patent, useful 8 years</div><div class="r d"><span>Amort. Expense</span><span class="a dv">7,500</span><span></span></div><div class="r c"><span>Accum. Amort.</span><span></span><span class="a cv">7,500</span></div><div class="m">Legal life 20, but outdated in 8. Use the shorter.</div></div>
+      <div class="card" data-s="3" style="padding:16px 20px"><b>Goodwill:</b> pay 5,000,000 for net assets worth 4,200,000 → goodwill <b class="num">800,000</b>. Only recorded when you <b>buy a company</b>.</div>
+      <div class="trap" data-s="5" style="font-size:20px"><b>R&amp;D</b> is expensed as it happens, even if it leads to a patent.</div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-ch="8" data-poll="p11" data-title="Live check: intangibles"></section>
+
+<section class="slide" data-ch="8" data-id="tat" data-title="Total asset turnover and trade-ins">
+  <div class="eyebrow"><span class="code">A1</span> <span class="code">P5</span> Turnover · trade-ins</div>
+  <h2>How hard the assets work, and trading one in</h2>
+  <div class="grid2" style="gap:40px">
+    <div class="card" data-s="1">
+      <h3>Total asset turnover</h3>
+      <div class="formula" style="font-size:24px">Net sales ÷ Average total assets</div>
+      <p class="num" style="font-size:23px;margin-top:14px">1,800,000 ÷ avg(1,100,000, 1,300,000)<br>= 1,800,000 ÷ 1,200,000 = <b class="ac" style="font-size:34px">1.5</b></p>
+      <p style="font-size:21px;margin:0">Every $1 of assets produced $1.50 of sales. Higher is better; compare within an industry.</p>
+    </div>
+    <div class="card" data-s="2">
+      <h3>Trade-in with commercial substance</h3>
+      <div class="formula" style="font-size:24px">Gain/loss = trade-in allowance − book value</div>
+      <p style="font-size:21px;margin-top:14px">Old truck: cost 40,000, accum. 28,000 → BV 12,000. Allowance 9,000 → <b style="color:var(--cr)">loss 3,000</b>.</p>
+      <div class="je" style="font-size:18px;padding:10px 14px"><div class="r d"><span>Truck (new)</span><span class="a dv">55,000</span><span></span></div><div class="r d"><span>Accum. Dep. (old)</span><span class="a dv">28,000</span><span></span></div><div class="r d"><span>Loss on Exchange</span><span class="a dv">3,000</span><span></span></div><div class="r c"><span>Truck (old)</span><span></span><span class="a cv">40,000</span></div><div class="r c"><span>Cash</span><span></span><span class="a cv">46,000</span></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ WRAP ============ -->
+<section class="slide" data-ch="6" data-id="traps" data-title="Ten traps">
+  <div class="eyebrow" style="color:var(--ink)">Before the game</div>
+  <h2>Ten traps your exam will try</h2>
+  <ol class="traplist">
+    <li data-s="1"><span class="c6">6</span><span style="all:unset">Cash <b>short</b> is a <b>debit</b>. Over is a credit.</span></li>
+    <li data-s="1"><span class="c6">6</span><span style="all:unset">Petty cash check = <b>fund − cash in the box</b>.</span></li>
+    <li data-s="2"><span class="c6">6</span><span style="all:unset">Bank-side items <b>never</b> get journal entries.</span></li>
+    <li data-s="2"><span class="c6">6</span><span style="all:unset">Days' sales uncollected ends with <b>× 365</b>.</span></li>
+    <li data-s="3"><span class="c7">7</span><span style="all:unset">Card sales: Sales is the <b>full price</b>.</span></li>
+    <li data-s="3"><span class="c7">7</span><span style="all:unset">Allowance write-off: <b>no change</b> to realizable value or income.</span></li>
+    <li data-s="4"><span class="c7">7</span><span style="all:unset">% of receivables gives a <b>target</b>. A debit balance gets <b>added</b>.</span></li>
+    <li data-s="4"><span class="c7">7</span><span style="all:unset">Dishonored note → <b>A/R</b>, not bad debts.</span></li>
+    <li data-s="5"><span class="c8">8</span><span style="all:unset">DDB multiplies <b>book value</b>, and stops at salvage.</span></li>
+    <li data-s="5"><span class="c8">8</span><span style="all:unset">Update depreciation <b>before</b> computing a gain or loss.</span></li>
+  </ol>
+</section>
+
+<section class="slide" data-ch="6" data-game="1" data-title="The final game">
+  <div class="game" id="gameRoot"></div>
+</section>
+
+<section class="slide title-slide" data-ch="6" data-id="end" data-title="Thanks">
+  <div class="kicker">That's a wrap</div>
+  <h1 style="font-size:104px"><span>Good luck</span><span class="s7">on the exam.</span></h1>
+  <p class="lead" style="max-width:820px">Rework the poll questions you missed without looking. If you can explain <i>why</i> the trap answer is wrong, you've got it.</p>
+  <p class="muted" style="font-size:22px">Richard Bernard · ACCT 2301</p>
+</section>
+
+</div><!-- stage -->
+</div><!-- deck -->
+<div id="bar" hidden><i></i></div>
+<div id="live" hidden><i></i><span id="liveTxt">Live: connecting</span></div>
+<div id="hud" hidden>
+  <button type="button" id="hPrev" aria-label="Previous">←</button>
+  <span id="hNum">1 / 1</span>
+  <button type="button" id="hNext" aria-label="Next">→</button>
+  <button type="button" id="hFull">Full screen</button>
+  <button type="button" id="hJoin">Phone view</button>
+  <button type="button" id="hReset">Reset answers</button>
+</div>
+<div id="keyBox" hidden><form id="keyForm" class="keycard" autocomplete="off">
+  <h2>Presenter key</h2><p id="keyMsg"></p>
+  <label for="keyIn">Key</label><input id="keyIn" type="password" spellcheck="false">
+  <div class="keyrow"><button type="submit" class="kgo">Turn on live answers</button><button type="button" id="keySkip" class="kskip">Present without them</button></div>
+</form></div>
+<div id="aud" hidden><div class="wrap" id="audWrap"></div></div>
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
+<script>
+(function(){
+"use strict";
+// ---------- content data ----------
+var JOIN_URL = /^https?:$/.test(location.protocol) ? location.origin + "/" : "https://acct-review.vercel.app/";
+var JOIN_HOST = JOIN_URL.replace(/^https?:\/\//, "").replace(/\/$/, "");
+var L = ["A","B","C","D"];
+
+var POLLS = {
+  p1:{ch:6,q:"The register tape shows $1,560 of cash sales. The drawer holds $1,548. How is Cash Over and Short recorded?",o:["Debit $12","Credit $12","Debit $1,548","No entry needed"],c:0,why:"Money is missing, so it acts like a loss: debit. Cash 1,548 + Cash Over and Short 12 = Sales 1,560."},
+  p2:{ch:6,q:"Petty cash fund $150. Receipts total $121. The box holds $31. How much is the reimbursement check?",o:["$121","$123","$119","$150"],c:2,why:"Check = fund − cash in the box = 150 − 31 = 119. Receipts are 121, so the $2 extra is a credit to Cash Over and Short (over)."},
+  p3:{ch:6,q:"Which bank reconciliation item needs a journal entry?",o:["Outstanding check","Deposit in transit","Bank service fee","Bank error"],c:2,why:"Only book-side items get entries. The fee is news to your books: Dr Miscellaneous Expense, Cr Cash."},
+  p4:{ch:7,q:"A customer pays for a $500 purchase with a bank card. The fee is 3%. What amount is credited to Sales?",o:["$485","$500","$515","$15"],c:1,why:"Sales is the full price. Cash 485, Credit Card Expense 15, Sales 500."},
+  p5:{ch:7,q:"Allowance method. You write off a $600 customer account. What happens to the realizable value of receivables?",o:["Drops $600","Rises $600","No change","Drops $1,200"],c:2,why:"A/R and the Allowance both drop $600, so the difference stays put. The expense was already recorded at year-end."},
+  p6:{ch:7,q:"A/R is $60,000 and 4% is uncollectible. Before adjusting, the allowance has a $350 DEBIT balance. Bad Debts Expense is:",o:["$2,050","$2,400","$2,750","$350"],c:2,why:"The target is 2,400 credit. You start 350 below zero, so you need 2,400 + 350 = 2,750."},
+  p7:{ch:7,q:"A $6,000, 60-day, 12% note. How much interest does it earn? (360-day year)",o:["$60","$120","$720","$1,200"],c:1,why:"A full year is 6,000 × 12% = 720. Sixty days is 1/6 of 360, so 720 ÷ 6 = 120."},
+  p8:{ch:8,q:"You buy land for a new store. Which cost does NOT go into the Land account?",o:["Tearing down an old building","Title and legal fees","Paving a parking lot","Back taxes you agree to pay"],c:2,why:"Parking lots wear out, so they go to Land Improvements and get depreciated. Land never does."},
+  p9:{ch:8,q:"Cost $40,000, salvage $4,000, 5-year life, double-declining-balance. Year 2 depreciation is:",o:["$7,200","$9,600","$8,640","$16,000"],c:1,why:"Rate = 2/5 = 40%. Year 1: 40% × 40,000 = 16,000. Year 2: 40% × 24,000 book value = 9,600. Salvage is ignored until the end."},
+  p10:{ch:8,q:"Equipment cost $20,000. Accumulated depreciation is $14,000 at Dec 31, at $4,000 a year. It's sold April 1 for $5,500. The result is:",o:["Loss of $500","Gain of $500","Gain of $1,500","Loss of $1,000"],c:1,why:"Update first: 3 months = 1,000. Book value = 20,000 − 15,000 = 5,000. 5,500 − 5,000 = 500 gain. Skip the update and you get the fake loss of 500."},
+  p11:{ch:8,q:"Which intangible asset is never amortized?",o:["Patent","Copyright","Goodwill","Leasehold improvements"],c:2,why:"Goodwill has an indefinite life, so it is tested for impairment each year instead."}
+};
+
+var GAME = [
+  {q:"Petty cash fund $200. Receipts $172. Cash in the box $25. Cash Over and Short?",o:["Debit $3","Credit $3","Debit $28","No entry"],c:0,why:"Expected cash 200 − 172 = 28. Only 25 there: $3 short = debit."},
+  {q:"A customer's check bounced (NSF). On the bank rec it goes:",o:["Subtract from bank","Subtract from book, with an entry","Add to book","Subtract from book, no entry"],c:1,why:"Your books didn't know. Dr Accounts Receivable, Cr Cash."},
+  {q:"A/R $20,000. Net sales $365,000. Days' sales uncollected?",o:["0.05 days","18.25 days","20 days","73 days"],c:2,why:"20,000 ÷ 365,000 × 365 = 20 days. The 365s cancel."},
+  {q:"Credit sales $400,000. 1% expected uncollectible (percent of sales). Allowance has a $900 credit. Bad Debts Expense?",o:["$3,100","$4,000","$4,900","$900"],c:1,why:"Percent of sales IS the expense. Ignore the existing balance."},
+  {q:"Allowance method: writing off a $350 account debits:",o:["Bad Debts Expense","Accounts Receivable","Allowance for Doubtful Accounts","Cash"],c:2,why:"Dr Allowance, Cr A/R. The expense was recorded at year-end."},
+  {q:"A 90-day note is signed January 10 (not a leap year). It matures:",o:["April 8","April 9","April 10","April 11"],c:2,why:"Jan 21 left + Feb 28 + Mar 31 = 80. Ten more days: April 10."},
+  {q:"A $5,000 note with $100 interest is dishonored. Debit:",o:["Bad Debts Expense $5,100","Accounts Receivable $5,100","Notes Receivable $5,000","Accounts Receivable $5,000"],c:1,why:"The maker still owes principal plus interest. Move it all to A/R."},
+  {q:"Straight-line: cost $50,000, salvage $5,000, 9-year life. Yearly depreciation?",o:["$5,556","$5,000","$4,500","$6,000"],c:1,why:"(50,000 − 5,000) ÷ 9 = 5,000."},
+  {q:"Equipment with a $8,000 book value (after updating depreciation) sells for $6,500. Record:",o:["Gain $1,500","Loss $1,500","Loss $6,500","No gain or loss"],c:1,why:"6,500 received − 8,000 book value = 1,500 loss."},
+  {q:"A $80,000 patent has 20 years of legal life but will be obsolete in 8. Yearly amortization?",o:["$4,000","$8,000","$10,000","$20,000"],c:2,why:"Use the shorter useful life: 80,000 ÷ 8 = 10,000."}
+];
+var GAME_SECS = 20;
+
+var SHAPES = [
+  '<svg class="sh" viewBox="0 0 48 48"><path d="M24 5 L45 42 H3 Z" fill="#fff"/></svg>',
+  '<svg class="sh" viewBox="0 0 48 48"><path d="M24 3 L45 24 L24 45 L3 24 Z" fill="#fff"/></svg>',
+  '<svg class="sh" viewBox="0 0 48 48"><circle cx="24" cy="24" r="20" fill="#fff"/></svg>',
+  '<svg class="sh" viewBox="0 0 48 48"><rect x="6" y="6" width="36" height="36" rx="3" fill="#fff"/></svg>'
+];
+var CHNAME = {6:"Ch 6 · Cash, Fraud & Internal Control",7:"Ch 7 · Receivables",8:"Ch 8 · Long-Term Assets"};
+// ---------- helpers ----------
+function $(s, r){ return (r || document).querySelector(s); }
+function $$(s, r){ return Array.prototype.slice.call((r || document).querySelectorAll(s)); }
+function fmt(n){ return Math.round(n).toLocaleString("en-US"); }
+function lsGet(k){ try { return localStorage.getItem(k); } catch(e){ return null; } }
+function lsSet(k, v){ try { localStorage.setItem(k, v); } catch(e){} }
+var reduceMotion = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+function countUp(el, to, ms){
+  if (reduceMotion){ el.textContent = fmt(to); return; }
+  var from = 0, t0 = performance.now(); ms = ms || 900;
+  (function tick(t){ var k = Math.min(1, (t - t0) / ms); k = 1 - Math.pow(1 - k, 3); el.textContent = fmt(from + (to - from) * k); if (k < 1) requestAnimationFrame(tick); })(t0);
+}
+function tweenText(el, from, to, ms){
+  var t0 = performance.now(); ms = ms || 600;
+  (function tick(t){ var k = Math.min(1, (t - t0) / ms); k = 1 - Math.pow(1 - k, 3); el.textContent = fmt(from + (to - from) * k); if (k < 1) requestAnimationFrame(tick); })(t0);
+}
+function qrSvg(text){
+  if (typeof qrcode !== "function") return '<div style="display:grid;place-items:center;height:100%;font:600 14px var(--mono);color:#5b6773;text-align:center">QR unavailable<br>' + text.replace(/^https:\/\//, "") + "</div>";
+  var q = qrcode(0, "M"); q.addData(text); q.make();
+  return q.createSvgTag({cellSize: 4, margin: 2, scalable: true});
+}
+function segGroup(el, cb){
+  el.addEventListener("click", function(e){
+    var b = e.target.closest("button"); if (!b) return;
+    $$("button", el).forEach(function(x){ x.setAttribute("aria-pressed", x === b ? "true" : "false"); });
+    cb(b.dataset.v);
+  });
+}
+
+// ---------- presenter deck ----------
+var D = {slides: [], cur: 0, step: 0, hooks: {}};
+
+function maxStep(sec){
+  var m = 0; $$("[data-s]", sec).forEach(function(f){ m = Math.max(m, +f.dataset.s); }); return m;
+}
+function applySteps(sec, step, animate){
+  $$("[data-s]", sec).forEach(function(f){
+    var on = +f.dataset.s <= step, was = f.classList.contains("on");
+    f.classList.toggle("on", on);
+    if (on && !was && animate){ $$("[data-count]", f).forEach(function(c){ countUp(c, +c.dataset.count); }); }
+  });
+  var h = D.hooks[sec.dataset.id]; if (h && h.step) h.step(sec, step);
+}
+function fitStage(){
+  var st = $("#stage"), w = innerWidth, h = innerHeight, s = Math.min(w / 1600, h / 900);
+  st.style.transform = "scale(" + s + ")";
+  st.style.left = ((w - 1600 * s) / 2) + "px"; st.style.top = ((h - 900 * s) / 2) + "px";
+}
+function go(i, step, animate){
+  i = Math.max(0, Math.min(D.slides.length - 1, i));
+  var prev = D.slides[D.cur], sec = D.slides[i];
+  if (prev && prev !== sec){
+    prev.classList.remove("active"); prev.classList.toggle("past", i > D.cur);
+    var ph = D.hooks[prev.dataset.id]; if (ph && ph.leave) ph.leave(prev);
+  }
+  D.slides.forEach(function(s, k){ if (k !== i && s !== prev) s.classList.toggle("past", k < i); });
+  sec.classList.remove("past"); sec.classList.add("active");
+  var entering = prev !== sec || D.cur !== i;
+  D.cur = i; D.step = step;
+  if (entering){ var h = D.hooks[sec.dataset.id]; if (h && h.enter) h.enter(sec); onSlideLive(sec); }
+  applySteps(sec, step, animate !== false);
+  $("#hNum").textContent = (i + 1) + " / " + D.slides.length;
+  $("#bar i").style.width = ((i + 1) / D.slides.length * 100) + "%";
+  lsSet("acct-deck-slide", String(i));
+}
+function next(){
+  var sec = D.slides[D.cur];
+  if (sec.dataset.game){ if (G.next()) return; }
+  if (D.step < maxStep(sec)) go(D.cur, D.step + 1); else if (D.cur < D.slides.length - 1) go(D.cur + 1, 0);
+}
+function prev(){
+  var sec = D.slides[D.cur];
+  if (sec.dataset.game && !G.canLeaveBack()) return;
+  if (D.step > 0) go(D.cur, D.step - 1, false);
+  else if (D.cur > 0){ var p = D.slides[D.cur - 1]; go(D.cur - 1, maxStep(p), false); }
+}
+
+function buildPoll(sec){
+  var P = POLLS[sec.dataset.poll];
+  sec.innerHTML =
+    '<div class="eyebrow"><span class="code">LIVE</span> Check your phone · Ch ' + P.ch + '</div>' +
+    '<div class="poll"><div><p class="qtext">' + P.q + '</p><div class="opts">' +
+    P.o.map(function(o, i){ return '<div class="opt' + (i === P.c ? " correct" : "") + '"><div class="fill"></div><span class="let">' + L[i] + '</span><span class="tx">' + o + '</span><span class="pct num">0%</span></div>'; }).join("") +
+    '</div><p class="why"><b>Why:</b> ' + P.why + '</p></div>' +
+    '<div class="side"><div class="qrcard"><div class="qr" data-qr></div><p>Scan or go to<br><b>' + JOIN_HOST + '</b></p></div>' +
+    '<div class="counter"><b class="pc-n">0</b><span>answered</span></div>' +
+    '<button type="button" class="revealbtn">Reveal answer</button><div class="pollnote"></div></div></div>';
+  $(".revealbtn", sec).addEventListener("click", function(e){ e.stopPropagation(); revealPoll(sec); });
+}
+
+function initDeck(){
+  $("#deck").hidden = false; $("#bar").hidden = false; $("#hud").hidden = false; $("#live").hidden = false;
+  document.body.style.background = "#1d2733";
+  D.slides = $$("#stage > .slide");
+  D.slides.forEach(function(sec, i){
+    if (sec.dataset.poll) buildPoll(sec);
+    if (!sec.classList.contains("divider") && !sec.classList.contains("title-slide") && !sec.dataset.game){
+      var f = document.createElement("div"); f.className = "foot";
+      f.innerHTML = "<span>" + CHNAME[sec.dataset.ch] + "</span><span>" + (i + 1) + "</span>";
+      sec.appendChild(f);
+    }
+  });
+  var qr = qrSvg(JOIN_URL);
+  $$("[data-qr]").forEach(function(q){ q.innerHTML = qr; });
+  Object.keys(D.hooks).forEach(function(k){ var sec = $('.slide[data-id="' + k + '"]'); if (sec && D.hooks[k].init) D.hooks[k].init(sec); });
+  G.init($("#gameRoot"));
+  fitStage(); addEventListener("resize", fitStage);
+  document.addEventListener("keydown", function(e){
+    if (e.target.matches && e.target.matches("input[type=text]")) return;
+    var k = e.key;
+    if (k === "ArrowRight" || k === "PageDown" || k === " " || k === "Enter"){ if (e.target.matches && e.target.matches("input[type=range]") && (k === "ArrowRight")) return; e.preventDefault(); next(); }
+    else if (k === "ArrowLeft" || k === "PageUp"){ if (e.target.matches && e.target.matches("input[type=range]") && k === "ArrowLeft") return; e.preventDefault(); prev(); }
+    else if (k === "f" || k === "F"){ toggleFull(); }
+    else if (k === "r" || k === "R"){ var s = D.slides[D.cur]; if (s.dataset.poll) revealPoll(s); }
+    else if (k === "Home"){ go(0, 0); }
+  });
+  $("#stage").addEventListener("click", function(e){
+    if (e.target.closest("button,input,label,a,select,.noadv")) return;
+    next();
+  });
+  $("#hPrev").onclick = prev; $("#hNext").onclick = next; $("#hFull").onclick = toggleFull;
+  $("#hJoin").onclick = function(){ window.open("/", "_blank", "noopener"); };
+  var armed = 0;
+  $("#hReset").onclick = function(){
+    var b = $("#hReset");
+    if (Date.now() - armed < 4000){ armed = 0; b.textContent = "Reset answers"; resetAnswers(); return; }
+    armed = Date.now(); b.textContent = "Click again to reset";
+    setTimeout(function(){ if (armed && Date.now() - armed >= 4000){ armed = 0; b.textContent = "Reset answers"; } }, 4100);
+  };
+  $$("[data-joinhost]").forEach(function(el){ el.textContent = JOIN_HOST; });
+  var idle = 0;
+  function wake(){ document.body.classList.remove("idle"); clearTimeout(idle); idle = setTimeout(function(){ if (document.fullscreenElement) document.body.classList.add("idle"); }, 2500); }
+  document.addEventListener("mousemove", wake); document.addEventListener("fullscreenchange", wake);
+  var saved = parseInt(lsGet("acct-deck-slide") || "0", 10) || 0;
+  go(saved < D.slides.length ? saved : 0, 0, false);
+  initLivePresenter();
+}
+function toggleFull(){
+  try {
+    if (document.fullscreenElement) document.exitFullscreen();
+    else { var p = document.documentElement.requestFullscreen(); if (p && p.catch) p.catch(function(){}); }
+  } catch(e){}
+}
+
+// ---------- slide hooks ----------
+D.hooks.triangle = {
+  enter: function(sec){ var p = $("#triPoly", sec); p.style.strokeDashoffset = "1500"; requestAnimationFrame(function(){ requestAnimationFrame(function(){ p.style.strokeDashoffset = "0"; }); }); }
+};
+
+D.hooks.petty = {
+  init: function(sec){
+    var F = 200, R = 162, exp = [["Postage", 64], ["Supplies", 58], ["Delivery", 40]];
+    function draw(cash){
+      cash = +cash; var d = cash - (F - R), check = F - cash, total = Math.max(F, R + cash);
+      var bar = $("#pcBar", sec);
+      bar.innerHTML = '<div style="width:' + (R / total * 100) + '%;background:#d9c79c;display:grid;place-items:center">receipts 162</div>' +
+        '<div style="width:' + (cash / total * 100) + '%;background:var(--c6);color:#fff;display:grid;place-items:center">cash ' + cash + '</div>' +
+        (d < 0 ? '<div style="width:' + (-d / total * 100) + '%;background:repeating-linear-gradient(45deg,var(--crs) 0 8px,#fff 8px 16px);color:var(--cr);display:grid;place-items:center">' + (-d) + '</div>' : "");
+      $("#pcLeg", sec).innerHTML = "<span>fund 200</span><span>" + (d < 0 ? "missing money → short → debit" : d > 0 ? "extra money (" + (R + cash) + " > 200) → over → credit" : "fills exactly → no over/short") + "</span>";
+      var rows = exp.map(function(x){ return '<div class="r d"><span>' + x[0] + ' Expense</span><span class="a dv">' + x[1] + '</span><span></span></div>'; }).join("");
+      if (d < 0) rows += '<div class="r d plug"><span>Cash Over and Short</span><span class="a dv">' + (-d) + '</span><span></span></div>';
+      if (d > 0) rows += '<div class="r c plug"><span>Cash Over and Short</span><span></span><span class="a cv">' + d + '</span></div>';
+      rows += '<div class="r c"><span>Cash</span><span></span><span class="a cv">' + check + '</span></div>';
+      $("#pcJE", sec).innerHTML = rows;
+      $("#pcRule", sec).innerHTML = '<span class="lab">The check</span><span class="num">200 − ' + cash + ' = <b>' + check + '</b></span>' + (d === 0 ? "" : '<br><span style="font-size:22px">Receipts 162 vs check ' + check + ': the gap of ' + Math.abs(d) + ' is the plug.</span>');
+    }
+    segGroup($("#pcSeg", sec), draw); draw(38);
+  }
+};
+
+D.hooks.dsu = { step: function(sec, s){ $("#dsuFill", sec).style.width = s >= 4 ? (36.5 / 365 * 100) + "%" : "0"; } };
+
+D.hooks.arledger = {
+  step: function(sec, s){
+    var el = $("#glAmt", sec), to = s >= 2 ? 3900 : s >= 1 ? 5100 : 4400, from = +(el.dataset.v || 4400);
+    if (from !== to) tweenText(el, from, to); el.dataset.v = to;
+  }
+};
+
+D.hooks.writeoff = {
+  init: function(sec){
+    var AR = 36000, AL = 1800, r = $("#woR", sec);
+    function draw(){
+      var w = +r.value, ar = AR - w, al = AL - w, net = ar - al;
+      $("#woV", sec).textContent = "$" + fmt(w);
+      $("#woBar", sec).innerHTML = '<div style="width:' + (net / AR * 100) + '%;background:var(--c7);color:#fff;display:grid;place-items:center">realizable ' + fmt(net) + '</div>' +
+        '<div style="width:' + (al / AR * 100) + '%;background:#c98f6d"></div>' +
+        (w ? '<div style="width:' + (w / AR * 100) + '%;background:repeating-linear-gradient(45deg,#fff 0 8px,var(--rule) 8px 16px)"></div>' : "");
+      $("#woLeg", sec).innerHTML = "<span>A/R " + fmt(ar) + "</span><span>allowance " + fmt(al) + "</span><span>written off " + fmt(w) + "</span>";
+      $("#woTbl", sec).innerHTML = '<tr><td></td><td class="n muted">Before</td><td class="n muted">After</td></tr>' +
+        '<tr><td>Accounts receivable</td><td class="n">36,000</td><td class="n">' + fmt(ar) + '</td></tr>' +
+        '<tr><td>Less allowance</td><td class="n">(1,800)</td><td class="n">(' + fmt(al) + ')</td></tr>' +
+        '<tr class="tot"><td>Realizable value</td><td class="n">34,200</td><td class="n" style="color:var(--good)">' + fmt(net) + '</td></tr>';
+      $("#woJ1", sec).textContent = fmt(w); $("#woJ2", sec).textContent = fmt(w);
+    }
+    r.addEventListener("input", draw); draw();
+  }
+};
+
+D.hooks.tank = {
+  init: function(sec){
+    var svg = $("#tankSvg", sec);
+    function draw(v){
+      v = +v; var target = 2400, ent = target - v, scale = 0.13, zeroY = 400;
+      var yT = zeroY - target * scale, yB = zeroY - v * scale;
+      var s = '<rect x="30" y="40" width="160" height="440" rx="12" fill="#fff" stroke="#14202e" stroke-width="4"/>';
+      s += '<rect x="34" y="' + yT + '" width="152" height="' + (yB - yT) + '" fill="#2c5aa0"/>';
+      if (v >= 0) s += '<rect x="34" y="' + yB + '" width="152" height="' + (zeroY - yB) + '" fill="#c98f6d"/><text x="110" y="' + ((yB + zeroY) / 2 + 7) + '" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="17" fill="#fff">500 Cr already</text>';
+      else s += '<rect x="36" y="' + zeroY + '" width="148" height="' + (yB - zeroY) + '" fill="none" stroke="#f7c9bd" stroke-width="3" stroke-dasharray="8 6"/><text x="110" y="' + ((yB + zeroY) / 2 + 7) + '" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="17" fill="#fff">500 Dr hole</text>';
+      s += '<line x1="20" y1="' + zeroY + '" x2="210" y2="' + zeroY + '" stroke="#14202e" stroke-width="3"/><text x="218" y="' + (zeroY + 7) + '" font-family="IBM Plex Mono,monospace" font-size="20" fill="#14202e">0</text>';
+      s += '<line x1="20" y1="' + yT + '" x2="210" y2="' + yT + '" stroke="#14202e" stroke-width="3" stroke-dasharray="10 6"/><text x="218" y="' + (yT - 4) + '" font-family="IBM Plex Mono,monospace" font-weight="600" font-size="20" fill="#14202e">target</text><text x="218" y="' + (yT + 20) + '" font-family="IBM Plex Mono,monospace" font-weight="600" font-size="20" fill="#14202e">2,400 Cr</text>';
+      s += '<text x="110" y="' + ((yT + Math.min(yB, zeroY)) / 2 + 10) + '" text-anchor="middle" font-family="Archivo,Arial,sans-serif" font-weight="800" font-size="34" fill="#fff">+' + fmt(ent) + '</text>';
+      s += '<text x="110" y="' + ((yT + Math.min(yB, zeroY)) / 2 + 36) + '" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="16" fill="#dde6f4">this year\'s entry</text>';
+      svg.innerHTML = s;
+      $("#tankOut", sec).innerHTML = '<span class="lab">Entry</span><span class="num">' + (v >= 0 ? "2,400 − 500" : "2,400 + 500") + " = <b>" + fmt(ent) + "</b></span>";
+    }
+    segGroup($("#tankSeg", sec), draw); draw(500);
+  }
+};
+
+D.hooks.honored = {
+  init: function(sec){
+    function draw(v){
+      var je = $("#honJE", sec), tx = $("#honTxt", sec);
+      if (v === "h"){
+        je.innerHTML = '<div class="h">Maker pays $4,000 note + $90 interest</div><div class="r d"><span>Cash</span><span class="a dv">4,090</span><span></span></div><div class="r c"><span>Notes Receivable</span><span></span><span class="a cv">4,000</span></div><div class="r c"><span>Interest Revenue</span><span></span><span class="a cv">90</span></div>';
+        tx.innerHTML = '<div class="tip">Honored means paid in full at maturity. The note leaves the books; the interest is earned.</div>';
+      } else {
+        je.innerHTML = '<div class="h">Maker does not pay</div><div class="r d"><span>A/R—Maker</span><span class="a dv">4,090</span><span></span></div><div class="r c"><span>Interest Revenue</span><span></span><span class="a cv">90</span></div><div class="r c"><span>Notes Receivable</span><span></span><span class="a cv">4,000</span></div><div class="m">Notes Receivable only holds notes that haven\'t matured, so the whole maturity value moves to A/R.</div>';
+        tx.innerHTML = '<div class="tip">The maker still owes you, interest included. You keep chasing it as a regular receivable.</div><div class="trap"><b>Trap:</b> dishonored is not the same as uncollectible. No Bad Debts Expense here. If it later proves hopeless, write it off like any A/R.</div>';
+      }
+    }
+    segGroup($("#honSeg", sec), draw); draw("h");
+  }
+};
+
+D.hooks.accrual = {
+  step: function(sec, s){
+    var a = $("#acc1", sec), b = $("#acc2", sec);
+    a.setAttribute("x2", s >= 1 ? 690 : 40); b.setAttribute("x2", s >= 2 ? 1340 : 690);
+  }
+};
+
+D.hooks.arturn = {
+  init: function(sec){ var h = ""; for (var i = 0; i < 12; i++) h += '<div class="tdot" style="--d:' + (i * 0.09) + 's"><span>' + (i + 1) + '</span></div>'; $("#turnDots", sec).innerHTML = h; }
+};
+
+D.hooks.costsort = {
+  step: function(sec, s){
+    var run = [0, 48000, 50880, 49920, 51120, 52620, 53040], to = run[Math.min(s, 6)];
+    var el = $("#csTot", sec), from = +(el.dataset.v || 0); if (from !== to) tweenText(el, from, to); el.dataset.v = to;
+  }
+};
+
+D.hooks.lumpsum = {
+  init: function(sec){
+    var parts = [["Land", 80000, 25, 75000, "#97561a"], ["Building", 200000, 62.5, 187500, "#14202e"], ["Equipment", 40000, 12.5, 37500, "#0d7471"]];
+    function bar(id, fn){ $("#" + id, sec).innerHTML = parts.map(function(p, i){ return '<div style="flex:' + p[2] + ';background:' + p[4] + ';transition-delay:' + (i * 0.15) + 's">' + fn(p) + '</div>'; }).join(""); }
+    bar("lsA", function(p){ return p[0] + "<small>" + fmt(p[1]) + "</small>"; });
+    bar("lsS", function(p){ return p[2] + "%"; });
+    bar("lsC", function(p){ return p[0] + "<small>" + fmt(p[3]) + "</small>"; });
+  }
+};
+
+D.hooks.depchart = {
+  init: function(sec){
+    var C = 36000, S = 4000, units = [24000, 22000, 18000, 16000];
+    function sched(m){
+      var bv = C, out = [];
+      for (var y = 0; y < 4; y++){
+        var e = m === "sl" ? 8000 : m === "uop" ? units[y] * 0.40 : Math.min(bv * 0.5, bv - S);
+        if (m === "ddb" && y === 3) e = bv - S;
+        bv -= e; out.push([e, bv]);
+      }
+      return out;
+    }
+    var F = {sl: "(36,000 − 4,000) ÷ 4<small>Same 8,000 every year</small>", uop: "32,000 ÷ 80,000 = $0.40/mile<small>× miles driven each year</small>", ddb: "2 ÷ 4 = 50% × book value<small>Big early, then stop at salvage</small>"};
+    var chart = $("#depSvg", sec);
+    var cols = '<div class="sal" style="bottom:' + (S / C * 100) + '%"></div>';
+    for (var i = 0; i < 5; i++) cols += '<div class="col"><div class="lb num"></div><div class="ad" style="height:0"></div><div class="bv" style="height:100%"></div></div>';
+    chart.innerHTML = cols;
+    $("#depX", sec).innerHTML = "<span>Start</span><span>Yr 1</span><span>Yr 2</span><span>Yr 3</span><span>Yr 4</span>";
+    var lg = document.createElement("div"); lg.className = "dlegend";
+    lg.innerHTML = '<span><i style="background:var(--c8)"></i>Book value</span><span><i style="background:#e2c39c"></i>Accumulated depreciation</span><span><i style="border-top:3px dashed var(--cr);height:0;border-radius:0"></i>Salvage 4,000</span>';
+    $("#depX", sec).after(lg);
+    function draw(m){
+      var rows = sched(m), cs = $$(".col", chart);
+      cs.forEach(function(c, i){
+        var bv = i === 0 ? C : rows[i - 1][1];
+        $(".bv", c).style.height = (bv / C * 100) + "%";
+        $(".ad", c).style.height = ((C - bv) / C * 100) + "%";
+        var lb = $(".lb", c); lb.textContent = fmt(bv); lb.style.bottom = "calc(" + (bv / C * 100) + "% + 6px)";
+        lb.style.color = "var(--ink)";
+      });
+      $(".lb", cs[0]).style.bottom = "calc(100% - 30px)"; $(".lb", cs[0]).style.color = "#fff";
+      $("#depF", sec).innerHTML = F[m];
+      $("#depT", sec).innerHTML = rows.map(function(r, i){ return "<tr><td>" + (i + 1) + '</td><td class="n">' + fmt(r[0]) + '</td><td class="n">' + fmt(r[1]) + "</td></tr>"; }).join("");
+    }
+    segGroup($("#depSeg", sec), draw); draw("sl");
+  }
+};
+
+D.hooks.caprev = {
+  init: function(sec){
+    var items = [
+      ["Routine oil change on the delivery van", 0, "Ordinary repair. Keeps it running as expected."],
+      ["New engine that adds 3 years to a truck's life", 1, "Extraordinary repair. Extends the life."],
+      ["Adding a loading dock to the warehouse", 1, "Betterment: an addition."],
+      ["Repainting faded trim on the office", 0, "Maintenance. No new benefit."],
+      ["Swapping manual controls for automatic ones", 1, "Betterment. More efficient."],
+      ["A $35 desk lamp expected to last 5 years", 0, "Immaterial, so expense it right away."]
+    ];
+    $("#flipGrid", sec).innerHTML = items.map(function(it){
+      return '<button type="button" class="flip" aria-pressed="false"><span class="fi"><span class="fa"><small>Tap to decide</small>' + it[0] + '</span><span class="fb ' + (it[1] ? "cap" : "exp") + '"><b>' + (it[1] ? "Capitalize" : "Expense") + "</b>" + it[2] + "</span></span></button>";
+    }).join("");
+    $$(".flip", sec).forEach(function(b){ b.addEventListener("click", function(){ b.setAttribute("aria-pressed", b.getAttribute("aria-pressed") === "true" ? "false" : "true"); }); });
+  }
+};
+
+D.hooks.disposal = {
+  init: function(sec){
+    var r = $("#dsR", sec), BV = 6000;
+    function draw(){
+      var p = +r.value, g = p - BV, m = $("#dsM", sec);
+      $("#dsV", sec).textContent = "$" + fmt(p);
+      var half = Math.min(1, Math.abs(g) / 3000) * 50;
+      m.style.left = (g >= 0 ? 50 : 50 - half) + "%"; m.style.width = half + "%";
+      m.style.background = g >= 0 ? "var(--good)" : "var(--cr)";
+      var j = '<div class="h">' + (g > 0 ? "Gain of " + fmt(g) : g < 0 ? "Loss of " + fmt(-g) : "No gain or loss") + '</div>';
+      j += '<div class="r d"><span>Cash</span><span class="a dv">' + fmt(p) + '</span><span></span></div>';
+      j += '<div class="r d"><span>Accumulated Depreciation</span><span class="a dv">24,000</span><span></span></div>';
+      if (g < 0) j += '<div class="r d plug"><span>Loss on Sale</span><span class="a dv">' + fmt(-g) + '</span><span></span></div>';
+      j += '<div class="r c"><span>Equipment</span><span></span><span class="a cv">30,000</span></div>';
+      if (g > 0) j += '<div class="r c plug"><span>Gain on Sale</span><span></span><span class="a cv">' + fmt(g) + '</span></div>';
+      $("#dsJE", sec).innerHTML = j;
+    }
+    r.addEventListener("input", draw); draw();
+  }
+};
+// ---------- live session (presenter side) ----------
+var LIVE = {room: null, state: {ep: 0, mode: "idle", title: ""}, revealed: {}, timer: null};
+
+function audience(){
+  if (!LIVE.room) return [];
+  return LIVE.room.peers().filter(function(p){ return p.kind === "viewer" && !p.sameTab && p.presence && p.presence.role === "aud"; });
+}
+function pidOf(p){ var v = p.presence && p.presence.pid; return (typeof v === "string" && /^[a-z0-9]{4,16}$/.test(v)) ? v : p.peer; }
+function nameOf(p){ var n = p.presence && p.presence.name; return (typeof n === "string" && n.trim()) ? n.trim().slice(0, 18) : "Player"; }
+
+function setLive(on, txt){ var el = $("#live"); el.classList.toggle("on", !!on); $("#liveTxt").textContent = txt; }
+function push(){ LIVE.state.ep++; send(); }
+function send(){ if (LIVE.room) LIVE.room.emit("state", LIVE.state).catch(function(){}); }
+
+// ---------- network ----------
+function api(op, body, key){
+  var opts = {method: body ? "POST" : "GET", cache: "no-store", headers: {}};
+  if (body){ opts.headers["Content-Type"] = "application/json"; opts.body = JSON.stringify(body); }
+  if (key) opts.headers["X-Presenter-Key"] = key;
+  return fetch("/api/live?op=" + op, opts).then(function(r){
+    if (!r.ok){ var e = new Error("http " + r.status); e.status = r.status; throw e; }
+    return r.status === 204 ? null : r.json();
+  });
+}
+
+// Polls who is answering on phones and sends the presenter's state. Same shape the deck used before.
+function presenterRoom(key, onChange){
+  var peers = [], connected = false, fails = 0, stopped = false;
+  function poll(){
+    return api("peers", null, key).then(function(d){
+      fails = 0; connected = true;
+      peers = (d.peers || []).map(function(r){ return {peer: r.pid, kind: "viewer", sameTab: false, presence: r.data || {}}; });
+      onChange();
+    }, function(e){
+      if (e.status === 401){ stopped = true; connected = false; onChange("key"); return; }
+      if (++fails > 2){ connected = false; onChange(); }
+    });
+  }
+  (function loop(){ if (stopped) return; poll().then(function(){ setTimeout(loop, 1000); }); })();
+  return {
+    peers: function(){ return peers; },
+    connected: function(){ return connected; },
+    refresh: poll,
+    emit: function(topic, state){ return api("state", {state: state}, key); }
+  };
+}
+
+function initLivePresenter(){
+  if (location.protocol === "file:"){ setLive(false, "Live answers off"); return; }
+  var key = lsGet("acct-key") || "";
+  if (!key){ askKey(); return; }
+  api("check", null, key).then(function(){ startLive(key); }, function(e){
+    if (e.status === 401){ lsSet("acct-key", ""); askKey("That key didn't work. Try again."); }
+    else if (e.status === 503) setLive(false, "Live answers off: no database yet");
+    else setLive(false, "Live answers unavailable");
+  });
+}
+function startLive(key){
+  var room = presenterRoom(key, function(why){
+    if (why === "key"){ LIVE.room = null; askKey("The presenter key changed. Enter it again."); return; }
+    setLive(room.connected(), room.connected() ? "Live · " + audience().length + " on phones" : "Live: reconnecting");
+    refreshLiveViews();
+  });
+  LIVE.room = room;
+  setInterval(function(){ if (room.connected()) send(); }, 4000);
+  G.onPeers();
+  onSlideLive(D.slides[D.cur]);
+}
+function askKey(msg){
+  setLive(false, "Live answers off");
+  var box = $("#keyBox"); box.hidden = false;
+  $("#keyMsg").textContent = msg || "Enter your presenter key to turn on live answers.";
+  var inp = $("#keyIn"); setTimeout(function(){ inp.focus(); }, 50);
+  $("#keyForm").onsubmit = function(e){
+    e.preventDefault();
+    var k = inp.value.trim(); if (!k) return;
+    api("check", null, k).then(function(){ lsSet("acct-key", k); box.hidden = true; startLive(k); },
+      function(err){ $("#keyMsg").textContent = err.status === 401 ? "That key didn't work. Try again." : "Can't reach the server. Check the connection."; });
+  };
+  $("#keySkip").onclick = function(){ box.hidden = true; };
+}
+function resetAnswers(){
+  var key = lsGet("acct-key"); if (!key || !LIVE.room) return;
+  api("reset", {}, key).then(function(){ LIVE.revealed = {}; G.reset(); onSlideLive(D.slides[D.cur]); });
+}
+
+function onSlideLive(sec){
+  if (!sec) return;
+  var st = LIVE.state; st.title = sec.dataset.title || "";
+  if (sec.dataset.poll){
+    var id = sec.dataset.poll, rv = LIVE.revealed[id];
+    st.mode = "poll"; st.poll = rv ? {id: id, phase: "revealed", counts: rv.counts, n: rv.n} : {id: id, phase: "open"};
+    delete st.game;
+    renderPollSlide(sec);
+  } else if (sec.dataset.game){
+    st.mode = "game"; delete st.poll; st.game = G.publicState(); G.onPeers();
+  } else { st.mode = "idle"; delete st.poll; delete st.game; }
+  push();
+}
+
+function pollCounts(id){
+  var c = [0, 0, 0, 0], n = 0;
+  audience().forEach(function(p){ var pr = p.presence; if (pr.q === id && typeof pr.a === "number" && pr.a >= 0 && pr.a < 4){ c[pr.a]++; n++; } });
+  return {counts: c, n: n};
+}
+function renderPollSlide(sec){
+  var id = sec.dataset.poll, rv = LIVE.revealed[id], P = POLLS[id];
+  var res = rv || pollCounts(id);
+  $(".pc-n", sec).textContent = res.n;
+  sec.classList.toggle("revealed", !!rv);
+  $(".revealbtn", sec).textContent = rv ? "Revealed" : "Reveal answer";
+  $(".pollnote", sec).textContent = LIVE.room ? (rv ? "Press → to continue" : "Press R or the button to reveal") : "Live answers are off: take a show of hands, then reveal.";
+  $$(".opt", sec).forEach(function(o, i){
+    var pct = res.n ? Math.round(res.counts[i] / res.n * 100) : 0;
+    $(".pct", o).textContent = rv ? pct + "%" : "";
+    $(".fill", o).style.width = rv ? Math.max(pct, rv && i === P.c && !res.n ? 100 : 0) + "%" : "0";
+  });
+}
+function revealPoll(sec){
+  var id = sec.dataset.poll;
+  if (LIVE.revealed[id]) return;
+  LIVE.revealed[id] = pollCounts(id);
+  renderPollSlide(sec);
+  LIVE.state.poll = {id: id, phase: "revealed", counts: LIVE.revealed[id].counts, n: LIVE.revealed[id].n};
+  push();
+}
+function refreshLiveViews(){
+  var sec = D.slides[D.cur]; if (!sec) return;
+  if (sec.dataset.poll && !LIVE.revealed[sec.dataset.poll]) renderPollSlide(sec);
+  if (sec.dataset.game) G.onPeers();
+}
+
+// ---------- the game (presenter side) ----------
+var G = (function(){
+  var root, closing = false, phase = "lobby", qi = -1, deadline = 0, scores = {}, lastCounts = [0, 0, 0, 0], raf = 0;
+  function players(){ return audience(); }
+  function publicState(){
+    var g = {phase: phase, qi: qi, total: GAME.length, dur: GAME_SECS};
+    if (phase === "q") g.remain = Math.max(0, deadline - Date.now());
+    if (phase === "reveal" || phase === "board" || phase === "final"){
+      g.counts = lastCounts; g.correct = GAME[qi] ? GAME[qi].c : null;
+      var ranked = rank();
+      g.scores = {}; ranked.forEach(function(r, i){ g.scores[r.pid] = [r.s, i + 1, r.last]; });
+      g.top = ranked.slice(0, 5).map(function(r){ return [r.n, r.s]; });
+      g.np = ranked.length;
+    }
+    return g;
+  }
+  function rank(){
+    return Object.keys(scores).map(function(k){ return {pid: k, n: scores[k].n, s: scores[k].s, last: scores[k].last}; }).sort(function(a, b){ return b.s - a.s; });
+  }
+  function sync(){ LIVE.state.mode = "game"; LIVE.state.game = publicState(); push(); }
+  function ensure(p){ var id = pidOf(p); if (!scores[id]) scores[id] = {n: nameOf(p), s: 0, last: 0}; scores[id].n = nameOf(p); return id; }
+  function answersFor(i){
+    return players().filter(function(p){ var g = p.presence.g; return g && g.qi === i && typeof g.a === "number" && g.a >= 0 && g.a < 4; });
+  }
+  function startQ(i){
+    qi = i; phase = "q"; deadline = Date.now() + GAME_SECS * 1000; lastCounts = [0, 0, 0, 0];
+    players().forEach(ensure);
+    render(); sync(); loop();
+  }
+  function closeQ(){
+    if (phase !== "q" || closing) return;
+    closing = true; cancelAnimationFrame(raf);
+    var done = function(){ closing = false; endQ(); };
+    if (LIVE.room && LIVE.room.refresh) setTimeout(function(){ LIVE.room.refresh().then(done, done); }, 1200); else done();
+  }
+  function endQ(){
+    if (phase !== "q") return;
+    cancelAnimationFrame(raf); phase = "reveal";
+    var Q = GAME[qi]; lastCounts = [0, 0, 0, 0];
+    players().forEach(ensure);
+    Object.keys(scores).forEach(function(k){ scores[k].last = 0; });
+    answersFor(qi).forEach(function(p){
+      var g = p.presence.g, id = ensure(p); lastCounts[g.a]++;
+      if (g.a === Q.c){
+        var ms = Math.max(0, Math.min(GAME_SECS * 1000, +g.ms || GAME_SECS * 1000));
+        var pts = Math.round(1000 - 500 * ms / (GAME_SECS * 1000));
+        scores[id].s += pts; scores[id].last = pts;
+      }
+    });
+    render(); sync();
+  }
+  function loop(){
+    cancelAnimationFrame(raf);
+    (function tick(){
+      if (phase !== "q") return;
+      var left = Math.max(0, deadline - Date.now()), el = $(".timer b", root), ring = $(".timer .rg", root);
+      if (el) el.textContent = Math.ceil(left / 1000);
+      if (ring) ring.style.strokeDashoffset = (440 * (1 - left / (GAME_SECS * 1000))).toFixed(1);
+      var n = answersFor(qi).length, np = players().length, ac = $(".ansct b", root); if (ac) ac.textContent = n;
+      if (left <= 0 || (np > 0 && n >= np)){ closeQ(); return; }
+      raf = requestAnimationFrame(tick);
+    })();
+  }
+  function esc(t){ var d = document.createElement("div"); d.textContent = t; return d.innerHTML; }
+  function render(){
+    if (!root) return;
+    var h = "", Q = GAME[qi];
+    if (phase === "lobby"){
+      var ps = players();
+      h = '<div class="g-top"><span>The final game · ' + GAME.length + ' questions · ' + GAME_SECS + ' seconds each</span><span>Faster correct answers score more</span></div>' +
+        '<div class="g-lobby"><div class="qrcard"><div class="qr">' + qrSvg(JOIN_URL) + '</div><p style="color:#14202e;text-align:center;font:600 19px var(--mono);margin:10px 0 0">' + JOIN_HOST + '</p></div><div><h2>Join the game</h2>' +
+        '<p style="font-size:28px;color:#cfdae4;margin:0">Scan the code, pick a name, and wait for the first question. Up to 1,000 points each.</p>' +
+        '<div class="ansct" style="text-align:left;margin-top:26px"><b class="np">' + ps.length + '</b>players in</div>' +
+        '<div class="names">' + ps.map(function(p){ return "<span>" + esc(nameOf(p)) + "</span>"; }).join("") + '</div>' +
+        (LIVE.room ? "" : '<p style="color:#f5c84c;font-size:22px;margin-top:16px">Live answers are off on this screen. You can still run the questions as a show of hands.</p>') +
+        '<div style="display:flex;gap:12px;margin-top:26px"><button type="button" class="gbtn" data-act="start">Start game →</button></div></div></div>';
+    } else if (phase === "q" || phase === "reveal"){
+      var rv = phase === "reveal";
+      h = '<div class="g-top"><span>Question ' + (qi + 1) + ' of ' + GAME.length + '</span><span>' + (rv ? "Answer" : "Answer on your phone") + '</span></div>' +
+        '<div class="g-q' + (rv ? " g-reveal" : "") + '"><p class="qt">' + Q.q + '</p>' +
+        '<div class="g-mid"><div class="timer">' + (rv ? "" : '<svg viewBox="0 0 160 160"><circle cx="80" cy="80" r="70" fill="none" stroke="rgba(255,255,255,.15)" stroke-width="12"/><circle class="rg" cx="80" cy="80" r="70" fill="none" stroke="#7fd1a8" stroke-width="12" stroke-dasharray="440" stroke-dashoffset="0" stroke-linecap="round"/></svg><b>' + GAME_SECS + '</b>') + '</div>' +
+        '<div class="g-why">' + (rv ? "<b>Why:</b> " + Q.why : "") + '</div>' +
+        '<div class="ansct"><b>' + (rv ? lastCounts.reduce(function(a, b){ return a + b; }, 0) : 0) + '</b>answers</div></div>' +
+        '<div class="tiles">' + Q.o.map(function(o, i){ return '<div class="tile t' + (i + 1) + (rv && i === Q.c ? " correct" : "") + '">' + SHAPES[i] + '<span>' + o + '</span><span class="ct">' + (rv ? lastCounts[i] : "") + '</span></div>'; }).join("") + '</div>' +
+        (rv ? '' : '<div style="text-align:center"><button type="button" class="gbtn ghost" data-act="end">End question now</button></div>') + '</div>';
+    } else if (phase === "board"){
+      var r = rank().slice(0, 5);
+      h = '<div class="g-top"><span>Leaderboard after question ' + (qi + 1) + '</span><span>' + (qi + 1 < GAME.length ? "Next: question " + (qi + 2) : "Final results next") + '</span></div>' +
+        '<h2 style="font:900 72px var(--disp);font-stretch:80%;text-align:center;margin-top:10px">Top five</h2><div class="board">' +
+        (r.length ? r.map(function(x, i){ return '<div class="brow" style="animation-delay:' + (i * 0.08) + 's"><span class="rk">' + (i + 1) + '</span><span>' + esc(x.n) + (x.last ? ' <span style="color:#7fd1a8;font-size:22px">+' + x.last + '</span>' : "") + '</span><span class="sc">' + fmt(x.s) + '</span></div>'; }).join("")
+          : '<p style="text-align:center;font-size:26px;color:#cfdae4">No live players yet.</p>') + '</div>';
+    } else if (phase === "final"){
+      var t = rank();
+      function pod(k, cls){ var x = t[k]; return '<div class="pod ' + cls + '"><div class="nm">' + (x ? esc(x.n) : "—") + '</div><div class="ps">' + (x ? fmt(x.s) + " pts" : "") + '</div><div class="blk">' + (k + 1) + '</div></div>'; }
+      h = '<div class="g-top"><span>Final results</span><span>' + t.length + ' players</span></div><h2 style="font:900 84px var(--disp);font-stretch:78%;text-align:center;margin-top:6px">The podium</h2>' +
+        '<div class="podium">' + pod(1, "p2") + pod(0, "p1") + pod(2, "p3") + '</div>';
+    }
+    root.innerHTML = h;
+  }
+  function next(){
+    if (phase === "lobby"){ startQ(0); return true; }
+    if (phase === "q"){ closeQ(); return true; }
+    if (phase === "reveal"){ phase = "board"; render(); sync(); return true; }
+    if (phase === "board"){ if (qi + 1 < GAME.length) startQ(qi + 1); else { phase = "final"; render(); sync(); } return true; }
+    return false;
+  }
+  return {
+    init: function(el){
+      root = el; render();
+      root.addEventListener("click", function(e){
+        var b = e.target.closest("[data-act]"); if (!b) return; e.stopPropagation();
+        if (b.dataset.act === "start" && phase === "lobby") startQ(0);
+        if (b.dataset.act === "end") closeQ();
+      });
+    },
+    next: next,
+    reset: function(){ cancelAnimationFrame(raf); phase = "lobby"; qi = -1; scores = {}; closing = false; render(); },
+    canLeaveBack: function(){ return phase === "lobby" || phase === "final"; },
+    publicState: publicState,
+    onPeers: function(){
+      if (phase === "lobby") render();
+    }
+  };
+})();
+// ---------- audience (phone) ----------
+var A = {room: null, state: null, pid: null, name: "", pick: {}, g: {qi: -1, start: 0, deadline: 0, a: null}, status: "connecting", isOwner: false};
+
+function aEsc(t){ var d = document.createElement("div"); d.textContent = t; return d.innerHTML; }
+function initAudience(isOwner){
+  A.isOwner = !!isOwner;
+  $("#aud").hidden = false; document.body.style.background = "var(--paper)";
+  A.pid = lsGet("acct-pid");
+  if (!A.pid || !/^[a-z0-9]{4,16}$/.test(A.pid)){ A.pid = Math.random().toString(36).slice(2, 12).replace(/[^a-z0-9]/g, "") || "p" + Date.now().toString(36); lsSet("acct-pid", A.pid); }
+  A.name = (lsGet("acct-name") || "").slice(0, 18);
+  aRender();
+  if (location.protocol === "file:"){ A.status = "off"; aRender(); return; }
+  A.me = {role: "aud", pid: A.pid, name: A.name};
+  if (A.name) aSendPresence();
+  setInterval(function(){ if (A.name) aSendPresence(); }, 20000);
+  var fails = 0;
+  (function poll(){
+    api("state").then(function(d){
+      fails = 0;
+      var s = d && d.state;
+      if (s && typeof s === "object" && s.mode){
+        // Server-stamped times keep every phone's game timer honest, whatever its own clock says.
+        if (s.game && s.game.phase === "q" && typeof s.game.remain === "number") s.game.remain -= Math.max(0, d.now - d.setAt);
+        if (!A.state || s.ep !== A.state.ep || s.mode !== A.state.mode) aOnState(s); else if (A.status !== "live"){ A.status = "live"; aRender(); }
+      } else if (A.status === "connecting" || A.status === "off"){ A.status = "waiting"; aRender(); }
+    }, function(){
+      if (++fails === 4){ A.status = "off"; aRender(); }
+    }).then(function(){ setTimeout(poll, document.hidden ? 4000 : 1200); });
+  })();
+}
+var aSending = false, aDirty = false;
+function aSendPresence(){
+  if (aSending){ aDirty = true; return; }
+  aSending = true;
+  api("presence", {pid: A.pid, data: A.me}).catch(function(){}).then(function(){
+    aSending = false; if (aDirty){ aDirty = false; aSendPresence(); }
+  });
+}
+function aPresence(extra){
+  if (!A.name) return;
+  A.me = A.me || {role: "aud", pid: A.pid};
+  A.me.name = A.name;
+  if (extra) for (var k in extra) A.me[k] = extra[k];
+  aSendPresence();
+}
+function aOnState(s){
+  var prevQ = A.state && A.state.game ? A.state.game.qi : -2, prevPhase = A.state && A.state.game ? A.state.game.phase : "";
+  A.state = s; A.status = "live";
+  if (s.mode === "game" && s.game && s.game.phase === "q"){
+    var g = s.game;
+    if (A.g.qi !== g.qi || prevPhase !== "q"){
+      if (A.g.qi !== g.qi){ A.g = {qi: g.qi, a: null, start: 0, deadline: 0}; }
+      if (!A.g.deadline){ A.g.deadline = Date.now() + (+g.remain || 0); A.g.start = A.g.deadline - g.dur * 1000; }
+    }
+  }
+  aRender();
+}
+function aTop(){
+  return '<div class="a-top"><span>ACCT 2301 · Ch 6–8 live</span>' + (A.name ? '<span class="me">' + aEsc(A.name) + "</span>" : "") + "</div>";
+}
+var aTimerRaf = 0;
+function aRender(){
+  var w = $("#audWrap"), s = A.state, h = aTop();
+  cancelAnimationFrame(aTimerRaf);
+  if (!A.name){
+    h += '<div class="a-card"><h1>Join the session</h1><p>Pick the name that shows on the leaderboard.</p>' +
+      '<label for="aName" class="a-status" style="text-align:left;display:block;margin:12px 0 6px">Your name</label>' +
+      '<input id="aName" class="a-input" maxlength="18" autocomplete="nickname" placeholder="e.g. Maria R."></div>' +
+      '<button type="button" class="a-btn" id="aJoin" disabled>Join</button>';
+    w.innerHTML = h + aOwnerLink();
+    var inp = $("#aName"), btn = $("#aJoin");
+    inp.addEventListener("input", function(){ btn.disabled = !inp.value.trim(); });
+    function join(){ var v = inp.value.replace(/[\u0000-\u001f\u007f-\u009f​-‏‪-‮⁠-⁯﻿]/g, "").trim().slice(0, 18); if (!v) return; A.name = v; lsSet("acct-name", v); aPresence(); aRender(); }
+    btn.addEventListener("click", join);
+    inp.addEventListener("keydown", function(e){ if (e.key === "Enter") join(); });
+    return;
+  }
+  if (A.status === "off"){
+    h += '<div class="a-card"><h1>Can\'t reach the live session</h1><p>Your phone lost its connection to the class screen.</p><p class="muted" style="font-size:15px">Check your Wi-Fi or data, then reload this page. You can still follow along on the big screen.</p></div>';
+    w.innerHTML = h + aOwnerLink(); return;
+  }
+  if (!s){
+    h += '<div class="a-card"><h1>You\'re in, ' + aEsc(A.name) + '.</h1><p>Waiting for Richard\'s screen…</p></div><p class="a-status">Keep this page open</p>';
+    w.innerHTML = h + aChangeName() + aOwnerLink(); aBindChange(); return;
+  }
+  if (s.mode === "poll" && s.poll && POLLS[s.poll.id]){
+    var P = POLLS[s.poll.id], id = s.poll.id, mine = A.pick[id], rv = s.poll.phase === "revealed";
+    h += '<div class="a-card"><div class="a-status" style="text-align:left;margin-bottom:8px">LIVE CHECK · CH ' + P.ch + '</div><p class="a-q">' + P.q + '</p></div><div class="a-opts">';
+    P.o.forEach(function(o, i){
+      var pct = rv && s.poll.n ? Math.round(s.poll.counts[i] / s.poll.n * 100) : 0;
+      h += '<button type="button" class="a-opt' + (rv && i === P.c ? " correct" : "") + '" data-i="' + i + '" aria-pressed="' + (mine === i) + '"' + (rv ? " disabled" : "") + '><span class="fill" style="width:' + (rv ? pct : 0) + '%"></span><span class="let">' + L[i] + '</span><span>' + o + '</span><span class="pc">' + (rv ? pct + "%" : "") + "</span></button>";
+    });
+    h += "</div>";
+    if (rv){
+      var ok = mine === P.c;
+      h += '<div class="a-card"><div class="a-big ' + (mine == null ? "" : ok ? "verdict-ok" : "verdict-no") + '">' + (mine == null ? "Answer: " + L[P.c] : ok ? "You got it" : "Not this time") + '</div><p style="margin:6px 0 0">' + P.why + "</p></div>";
+    } else {
+      h += '<p class="a-status">' + (mine == null ? "Tap an answer" : "Locked in. You can change it until the reveal.") + "</p>";
+    }
+    w.innerHTML = h;
+    if (!rv) $$(".a-opt", w).forEach(function(b){ b.addEventListener("click", function(){ var i = +b.dataset.i; A.pick[id] = i; aPresence({q: id, a: i}); aRender(); }); });
+    return;
+  }
+  if (s.mode === "game" && s.game){
+    var g = s.game, Q = GAME[g.qi], me = g.scores && g.scores[A.pid];
+    if (g.phase === "lobby"){
+      h += '<div class="a-card"><h1>You\'re in the game.</h1><p>' + (g.total || GAME.length) + ' questions, ' + (g.dur || GAME_SECS) + ' seconds each. Faster correct answers score more.</p></div><p class="a-status">Waiting for the first question…</p>';
+      w.innerHTML = h; return;
+    }
+    if (g.phase === "q" && Q){
+      var picked = A.g.qi === g.qi ? A.g.a : null;
+      h += '<div class="a-status" style="text-align:left">QUESTION ' + (g.qi + 1) + " OF " + g.total + '</div><div class="a-card"><p class="a-q" style="font-size:20px">' + Q.q + '</p></div>' +
+        '<div class="a-timer"><i id="aBar"></i></div><div class="a-tiles">' +
+        Q.o.map(function(o, i){ return '<button type="button" class="a-tile t' + (i + 1) + (picked === i ? " mine" : "") + '" data-i="' + i + '"' + (picked != null && picked !== i ? " disabled" : "") + ">" + SHAPES[i] + "<span>" + o + "</span></button>"; }).join("") + "</div>" +
+        '<p class="a-status">' + (picked != null ? "Locked in. Eyes on the screen." : "Tap fast: speed adds points") + "</p>";
+      w.innerHTML = h;
+      if (picked == null) $$(".a-tile", w).forEach(function(b){ b.addEventListener("click", function(){
+        if (A.g.a != null) return;
+        var i = +b.dataset.i, ms = Math.max(0, Date.now() - A.g.start);
+        A.g.a = i; aPresence({g: {qi: g.qi, a: i, ms: Math.round(ms)}}); aRender();
+      }); });
+      (function tick(){ var bar = $("#aBar"); if (!bar) return; var left = Math.max(0, A.g.deadline - Date.now()); bar.style.width = (left / (g.dur * 1000) * 100) + "%"; if (left > 0) aTimerRaf = requestAnimationFrame(tick); })();
+      return;
+    }
+    if ((g.phase === "reveal" || g.phase === "board") && Q){
+      var mineA = A.g.qi === g.qi ? A.g.a : null, okG = mineA === Q.c;
+      h += '<div class="a-card" style="text-align:center"><div class="a-big ' + (okG ? "verdict-ok" : "verdict-no") + '">' + (mineA == null ? "Time's up" : okG ? "Correct" : "Not quite") + '</div>' +
+        (me ? '<p style="font-size:22px;margin:8px 0 0"><b>+' + (me[2] || 0) + '</b> this round</p>' : "") + '</div>' +
+        '<div class="a-card"><p style="margin:0"><b>Answer: ' + L[Q.c] + ". " + Q.o[Q.c] + '</b></p><p class="muted" style="margin:6px 0 0;font-size:16px">' + Q.why + "</p></div>" +
+        (me ? '<div class="a-card" style="display:flex;justify-content:space-between;align-items:center"><span class="a-status">YOUR SCORE</span><span class="a-big" style="font-size:40px">' + fmt(me[0]) + '</span><span class="a-status">#' + me[1] + " of " + g.np + "</span></div>" : "");
+      w.innerHTML = h; return;
+    }
+    if (g.phase === "final"){
+      h += '<div class="a-card" style="text-align:center"><div class="a-status">FINAL</div><div class="a-big">' + (me ? "#" + me[1] : "Thanks for playing") + '</div>' + (me ? '<p style="font-size:20px;margin:6px 0 0">' + fmt(me[0]) + " points · " + g.np + " players</p>" : "") + "</div>";
+      if (g.top && g.top.length) h += '<div class="a-card"><div class="a-status" style="text-align:left;margin-bottom:8px">TOP FIVE</div>' + g.top.map(function(t, i){ return '<p style="display:flex;justify-content:space-between;margin:0 0 6px"><span>' + (i + 1) + ". " + aEsc(String(t[0]).slice(0, 18)) + '</span><b class="num">' + fmt(+t[1] || 0) + "</b></p>"; }).join("") + "</div>";
+      w.innerHTML = h; return;
+    }
+  }
+  h += '<div class="a-card"><h1>Eyes on the screen</h1><p>' + (s.title ? "Now: " + aEsc(String(s.title).slice(0, 80)) : "") + '</p><p class="muted" style="font-size:15px">The next question will pop up here on its own.</p></div>';
+  w.innerHTML = h + aChangeName() + aOwnerLink(); aBindChange();
+}
+function aChangeName(){ return '<button type="button" class="a-status" id="aRename" style="background:none;border:0;text-decoration:underline">Change my name</button>'; }
+function aBindChange(){ var b = $("#aRename"); if (b) b.addEventListener("click", function(){ A.name = ""; lsSet("acct-name", ""); aRender(); }); }
+function aOwnerLink(){ return ""; }
+
+// ---------- boot ----------
+(function boot(){
+  if (/^\/present\b/.test(location.pathname) || location.hash === "#present") initDeck();
+  else initAudience(false);
+})();
+})();
+</script></body></html>
